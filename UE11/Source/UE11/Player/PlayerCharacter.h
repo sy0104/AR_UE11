@@ -24,6 +24,7 @@ protected:
 
 	float	mMoveDir;
 	class UPlayerAnimInstance* mAnimInst;
+	bool	mDeath;
 
 protected:
 	// Called when the game starts or when spawned
@@ -48,4 +49,8 @@ public:
 	// 액션매핑 바인딩 함수
 	// 리턴타입: void 인자 없는 형태이다.
 	void NormalAttack();
+	void JumpKey();
+
+public:
+	virtual void NormalAttackCheck();
 };

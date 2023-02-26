@@ -29,9 +29,15 @@ AKnightCharacter::AKnightCharacter()
 
 	// ClassFinder는 레퍼런스 경로를 이용하여 에셋의 클래스 정보를 불러온다.
 	// 이때 레퍼런스 경로는 에디터에서 우클릭 -> 레퍼런스 복사를 이용하여 경로를 얻어올 수 있는데
-	// Class 정보를 불러오기 위해서 경로의 마짐가에 _C 를 무조건 붙여주어야 한다.
+	// Class 정보를 불러오기 위해서 경로의 마지막에 _C 를 무조건 붙여주어야 한다.
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimClass(TEXT("AnimBlueprint'/Game/Player/Animation/ABKnight.ABKnight_C'"));
 
 	if (AnimClass.Succeeded())
 		GetMesh()->SetAnimInstanceClass(AnimClass.Class);
+}
+
+void AKnightCharacter::NormalAttackCheck()
+{
+	// 근접용 공격 체크
+
 }

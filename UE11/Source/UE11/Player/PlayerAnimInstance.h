@@ -6,6 +6,14 @@
 #include "Animation/AnimInstance.h"
 #include "PlayerAnimInstance.generated.h"
 
+UENUM(BlueprintType)
+enum class EPlayerAnimType : uint8
+{
+	Ground,		// Idle, Run, Attack
+	Jump,		// 위로 솟구치는것만
+	Fall,		// 점프해서 내려오거나 높은곳에서 떨어짐
+	Death
+};
 
 UCLASS()
 class UE11_API UPlayerAnimInstance : public UAnimInstance
@@ -28,6 +36,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<UAnimMontage*> mAttackMontageArray;
 
+	// 점프 후 착지했을 때 회복 모션을 수행해주는 몽타주
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UAnimMontage*		mFallRecoveryMontage;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	bool  mAttackEnable;	// 공격 가능 상태인지 아닌지
 
@@ -35,10 +47,27 @@ protected:
 	int32 mAttackIndex;		// 어떤 공격 몽타주를 선택해야 하는지
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	bool  mAttack;
+	bool  mAttack;			// 플레이어가 공격 상태인지 아닌지 저장
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EPlayerAnimType  mAnimType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	bool			mGround;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float			mFallRecoveryAdditive;	// 에디티브 알파값 조절용
 
 public:
-	void SetMoveDir(float Dir) { mMoveDir = Dir; }
+	EPlayerAnimType GetPlayerAnimType() const
+	{
+		return mAnimType;
+	}
+
+	void SetMoveDir(float Dir) 
+	{ 
+		mMoveDir = Dir;
+	}
 
 public:
 	virtual void NativeInitializeAnimation();	// 생성될 때 초기화 용도
@@ -46,6 +75,7 @@ public:
 
 public:
 	void Attack();
+	void Jump();
 
 public:
 	// 노티파이 함수는 void AnimNotify_노티파이이름() 의 형태로 만들어준다.
@@ -58,4 +88,13 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_AttackEnd();
+
+	UFUNCTION()
+	void AnimNotify_JumpEnd();
+
+	UFUNCTION()
+	void AnimNotify_FallEnd();
+
+	UFUNCTION()
+	void AnimNotify_FallRecoveryEnd();
 };

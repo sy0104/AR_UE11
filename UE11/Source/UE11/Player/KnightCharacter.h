@@ -5,9 +5,8 @@
 #include "PlayerCharacter.h"
 #include "KnightCharacter.generated.h"
 
-/**
- * 
- */
+
+
 UCLASS()
 class UE11_API AKnightCharacter : public APlayerCharacter
 {
@@ -15,4 +14,7 @@ class UE11_API AKnightCharacter : public APlayerCharacter
 	
 public:
 	AKnightCharacter();
+
+public:
+	virtual void NormalAttackCheck();
 };

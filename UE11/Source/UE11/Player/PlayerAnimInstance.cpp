@@ -11,6 +11,12 @@ UPlayerAnimInstance::UPlayerAnimInstance()
 	mAttack = false;
 	mAttackEnable = true;
 	mAttackIndex = 0;
+
+	mAnimType = EPlayerAnimType::Ground;
+
+	mGround = true;
+
+	mFallRecoveryAdditive = 0.f;
 }
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
@@ -31,6 +37,14 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		// 매 프레임마다 속도의 비율을 저장해두고 있음
 		UCharacterMovementComponent* Movement = PlayerCharacter->GetCharacterMovement();
 		mSpeedRatio = Movement->Velocity.Size() / Movement->MaxWalkSpeed;
+
+		// 땅 위에 있는지를 판단한다.
+		mGround = Movement->IsMovingOnGround();
+
+		if (!mGround && mAnimType != EPlayerAnimType::Jump)
+		{
+			mAnimType = EPlayerAnimType::Fall;
+		}
 	}
 }
 
@@ -58,10 +72,19 @@ void UPlayerAnimInstance::Attack()
 		mAttackEnable = true;
 }
 
+void UPlayerAnimInstance::Jump()
+{
+	mAnimType = EPlayerAnimType::Jump;
+}
+
 void UPlayerAnimInstance::AnimNotify_Attack()
 {
-	PrintViewport(1.f, FColor::Red, TEXT("Attack"));
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
 
+	if (IsValid(PlayerCharacter))
+	{
+		PlayerCharacter->NormalAttackCheck();
+	}
 }
 
 void UPlayerAnimInstance::AnimNotify_AttackEnable()
@@ -76,4 +99,27 @@ void UPlayerAnimInstance::AnimNotify_AttackEnd()
 	mAttackIndex = 0;
 	mAttackEnable = true;
 	mAttack = false;
+}
+
+void UPlayerAnimInstance::AnimNotify_JumpEnd()
+{
+	mAnimType = EPlayerAnimType::Fall;
+}
+
+void UPlayerAnimInstance::AnimNotify_FallEnd()
+{
+	mAnimType = EPlayerAnimType::Ground;
+
+	if (IsValid(mFallRecoveryMontage))
+	{
+		mFallRecoveryAdditive = 1.f;
+
+		Montage_SetPosition(mFallRecoveryMontage, 0.f);
+		Montage_Play(mFallRecoveryMontage);
+	}
+}
+
+void UPlayerAnimInstance::AnimNotify_FallRecoveryEnd()
+{
+	mFallRecoveryAdditive = 0.f;
 }

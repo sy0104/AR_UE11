@@ -27,6 +27,16 @@ APlayerCharacter::APlayerCharacter()
 	mSpringArm->SetRelativeRotation(FRotator(-15.0, 90.0, 0.0));
 
 	mMoveDir = 0.f;
+
+	GetCharacterMovement()->JumpZVelocity = 750.f;
+
+	mDeath = false;
+
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
+
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned
@@ -58,12 +68,15 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("CameraZoom"), this, &APlayerCharacter::CameraZoom);
 
 	// 액션매핑 바인드
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("NormalAttack"), EInputEvent::IE_Pressed, this,
-		&APlayerCharacter::NormalAttack);
+	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("NormalAttack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::NormalAttack);
+	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Jump"), EInputEvent::IE_Pressed, this, &APlayerCharacter::JumpKey);
 }
 
 void APlayerCharacter::MoveFront(float Scale)
 {
+	if (mDeath)
+		return;
+
 	mMoveDir = Scale;
 
 	if (Scale == 0.f)
@@ -76,6 +89,9 @@ void APlayerCharacter::MoveFront(float Scale)
 
 void APlayerCharacter::MoveSide(float Scale)
 {
+	if (mDeath)
+		return;
+
 	if (mMoveDir == 1.f)
 	{
 		// w키를 누른 상태에서 a, d는 없는 상태.
@@ -131,7 +147,7 @@ void APlayerCharacter::MoveSide(float Scale)
 
 void APlayerCharacter::RotationCameraZ(float Scale)
 {
-	if (Scale == 0.f)
+	if (mDeath || Scale == 0.f)
 		return;
 
 	AddControllerYawInput(Scale * 180.f * GetWorld()->GetDeltaSeconds());
@@ -174,6 +190,27 @@ void APlayerCharacter::CameraZoom(float Scale)
 
 void APlayerCharacter::NormalAttack()
 {
+	if (mDeath)
+		return;
+
 	mAnimInst->Attack();
+}
+
+void APlayerCharacter::JumpKey()
+{
+	if (mDeath)
+		return;
+
+	// 살아있을 경우 땅 위에 있을 때 점프가 가능하도록 한다.
+	else if (mAnimInst->GetPlayerAnimType() != EPlayerAnimType::Ground)
+		return;
+
+	Jump();
+	mAnimInst->Jump();
+}
+
+void APlayerCharacter::NormalAttackCheck()
+{
+	
 }
 
