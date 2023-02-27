@@ -11,13 +11,6 @@ AMinionWarrior::AMinionWarrior()
 	if (MeshAsset.Succeeded())
 		GetMesh()->SetSkeletalMesh(MeshAsset.Object);
 
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
-	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
-	GetCapsuleComponent()->SetNotifyRigidBodyCollision(false);
-	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;	// 밝고 올라가지 못하도록
-
 	GetCapsuleComponent()->SetCapsuleHalfHeight(110.f);
 	GetCapsuleComponent()->SetCapsuleRadius(50.f);
 

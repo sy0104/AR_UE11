@@ -3,7 +3,10 @@
 #pragma once
 
 #include "EngineMinimal.h"
-#include "DrawDebugHelpers.h"
+#include "DrawDebugHelpers.h"	// 디버깅용 도형 출력가능
+#include "EngineGlobals.h"
+#include "Engine.h"
+
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"
 
@@ -104,6 +107,24 @@ public:
 	float	TraceDistance;
 };
 
+USTRUCT(BlueprintType)
+struct FSkillInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	SlotNumber;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	SkillNumber;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	class ASkillActor*	SkillActor;
+};
 
 
 UCLASS()

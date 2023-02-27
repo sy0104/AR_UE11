@@ -35,14 +35,38 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EMonsterAnimType	mAnimType;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float 	mHitAdditive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UAnimMontage* 	mHitMontage;
+
 public:
 	void ChangeAnim(EMonsterAnimType Anim)
 	{
 		mAnimType = Anim;
 	}
 
+	void Hit()
+	{
+		if (!IsValid(mHitMontage))
+			return;
+
+		mHitAdditive = 1.f;
+
+		if (!Montage_IsPlaying(mHitMontage))
+		{
+			Montage_SetPosition(mHitMontage, 0.f);
+			Montage_Play(mHitMontage);
+		}
+
+	}
 
 public:
 	UFUNCTION()
 	void AnimNotify_DeathEnd();
+
+	UFUNCTION()
+	void AnimNotify_HitEnd();
+
 };

@@ -20,6 +20,13 @@ protected:
 	FMonsterInfo	mInfo;
 
 	class UMonsterAnimInstance*		mAnimInst;
+	class AMonsterSpawnPoint*		mSpawnPoint;	// 자신이 태어난 스폰 포인트를 알고있도록 한다
+
+public:
+	void SetSpawnPoint(class AMonsterSpawnPoint* SpawnPoint)
+	{
+		mSpawnPoint = SpawnPoint;
+	}
 
 protected:
 	// Called when the game starts or when spawned

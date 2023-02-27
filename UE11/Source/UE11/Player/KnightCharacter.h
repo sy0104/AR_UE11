@@ -20,4 +20,5 @@ protected:
 
 public:
 	virtual void NormalAttackCheck();
+	virtual void Skill1();
 };

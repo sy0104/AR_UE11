@@ -3,6 +3,7 @@
 
 #include "Monster.h"
 #include "MonsterAnimInstance.h"
+#include "MonsterSpawnPoint.h"
 
 // Sets default values
 AMonster::AMonster()
@@ -10,6 +11,14 @@ AMonster::AMonster()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	GetCapsuleComponent()->SetNotifyRigidBodyCollision(false);
+	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;	// 밝고 올라가지 못하도록
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;	// 스폰시에도 AI 컨트롤러가 빙의되도록
 }
 
 // Called when the game starts or when spawned
@@ -36,9 +45,12 @@ void AMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	int32 Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Damage = Damage - mInfo.ArmorPoint;
 
-	mInfo.HP -= (int32)Damage;
+	mInfo.HP -= Damage;
+
+	Damage = Damage < 1 ? 1 : Damage;
 
 	if (mInfo.HP <= 0)
 	{
@@ -46,6 +58,12 @@ float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 
 		// 죽었다.
 		mAnimInst->ChangeAnim(EMonsterAnimType::Death);
+		mSpawnPoint->RemoveMonster(this);
+	}
+
+	else
+	{
+		mAnimInst->Hit();
 	}
 
 	return Damage;

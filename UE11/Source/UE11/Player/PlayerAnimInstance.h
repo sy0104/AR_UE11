@@ -15,6 +15,19 @@ enum class EPlayerAnimType : uint8
 	Death
 };
 
+USTRUCT(BlueprintType)
+struct FSkillAnimationInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32			SkillNumber;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UAnimMontage*	Montage;
+};
+
 UCLASS()
 class UE11_API UPlayerAnimInstance : public UAnimInstance
 {
@@ -34,11 +47,14 @@ protected:
 
 	// TArray: STL 벡터같은 가변적인 어레이 클래스, 언리얼 엔진의 배열 클래스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	TArray<UAnimMontage*> mAttackMontageArray;
+	TArray<UAnimMontage*>	mAttackMontageArray;
 
 	// 점프 후 착지했을 때 회복 모션을 수행해주는 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UAnimMontage*		mFallRecoveryMontage;
+	UAnimMontage*			mFallRecoveryMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FSkillAnimationInfo>	mSkillMontageArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	bool  mAttackEnable;	// 공격 가능 상태인지 아닌지
@@ -58,6 +74,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float			mFallRecoveryAdditive;	// 에디티브 알파값 조절용
 
+	int32	mUseSkillNumber;	// 어떤 스킬을 사용하는지
+
 public:
 	EPlayerAnimType GetPlayerAnimType() const
 	{
@@ -76,6 +94,7 @@ public:
 public:
 	void Attack();
 	void Jump();
+	void UseSkill(int32 SkillNumber);
 
 public:
 	// 노티파이 함수는 void AnimNotify_노티파이이름() 의 형태로 만들어준다.
@@ -97,4 +116,7 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_FallRecoveryEnd();
+
+	UFUNCTION()
+	void AnimNotify_UseSkill();
 };

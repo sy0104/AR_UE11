@@ -20,7 +20,10 @@ protected:
 	USpringArmComponent* mSpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	UCameraComponent* mCamera;
+	UCameraComponent*	mCamera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (AllowPrivateAccess = true))
+	TArray<FSkillInfo>	mSkillInfoArray;
 
 	float	mMoveDir;
 	class UPlayerAnimInstance* mAnimInst;
@@ -53,8 +56,9 @@ public:
 	// 리턴타입: void 인자 없는 형태이다.
 	void NormalAttack();
 	void JumpKey();
+	void Skill1Key();
 
 public:
 	virtual void NormalAttackCheck();
-
+	virtual void Skill1();
 };

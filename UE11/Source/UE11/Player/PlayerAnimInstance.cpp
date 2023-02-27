@@ -3,6 +3,7 @@
 
 #include "PlayerAnimInstance.h"
 #include "PlayerCharacter.h"
+#include "../Skill/SkillProjectile.h"
 
 UPlayerAnimInstance::UPlayerAnimInstance()
 {
@@ -17,6 +18,8 @@ UPlayerAnimInstance::UPlayerAnimInstance()
 	mGround = true;
 
 	mFallRecoveryAdditive = 0.f;
+
+	mUseSkillNumber = -1;	// 사용하는 스킬이 없음
 }
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
@@ -77,6 +80,27 @@ void UPlayerAnimInstance::Jump()
 	mAnimType = EPlayerAnimType::Jump;
 }
 
+void UPlayerAnimInstance::UseSkill(int32 SkillNumber)
+{
+	int32 Count = mSkillMontageArray.Num();
+
+	for (int32 i = 0; i < Count; ++i)
+	{
+		if (mSkillMontageArray[i].SkillNumber == SkillNumber)
+		{
+			mUseSkillNumber = SkillNumber;
+
+			if (!Montage_IsPlaying(mSkillMontageArray[i].Montage))
+			{
+				Montage_SetPosition(mSkillMontageArray[i].Montage, 0.f);
+				Montage_Play(mSkillMontageArray[i].Montage);
+			}
+
+			break;
+		}
+	}
+}
+
 void UPlayerAnimInstance::AnimNotify_Attack()
 {
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
@@ -122,4 +146,13 @@ void UPlayerAnimInstance::AnimNotify_FallEnd()
 void UPlayerAnimInstance::AnimNotify_FallRecoveryEnd()
 {
 	mFallRecoveryAdditive = 0.f;
+}
+
+void UPlayerAnimInstance::AnimNotify_UseSkill()
+{
+	// 스킬을 사용한다.
+	if (mUseSkillNumber == -1)
+		return;
+
+
 }

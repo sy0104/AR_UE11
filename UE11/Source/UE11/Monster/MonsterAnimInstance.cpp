@@ -6,6 +6,8 @@
 UMonsterAnimInstance::UMonsterAnimInstance()
 {
 	mAnimType = EMonsterAnimType::Idle;
+
+	mHitAdditive = 0.f;
 }
 
 void UMonsterAnimInstance::NativeInitializeAnimation()
@@ -21,4 +23,9 @@ void UMonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void UMonsterAnimInstance::AnimNotify_DeathEnd()
 {
 	TryGetPawnOwner()->Destroy();
+}
+
+void UMonsterAnimInstance::AnimNotify_HitEnd()
+{
+	mHitAdditive = 0.f;
 }

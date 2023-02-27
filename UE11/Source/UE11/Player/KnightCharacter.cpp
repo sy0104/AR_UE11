@@ -4,6 +4,8 @@
 #include "KnightCharacter.h"
 #include "UE11PlayerState.h"
 #include "../Particle/ParticleCascade.h"
+#include "PlayerAnimInstance.h"
+#include "../Skill/SkillProjectile.h"
 
 AKnightCharacter::AKnightCharacter()
 {
@@ -50,7 +52,7 @@ void AKnightCharacter::BeginPlay()
 
 	// PlayerInfo 값 설정
 	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
-	State->mPlayerInfo.AttackPoint = 150;
+	State->mPlayerInfo.AttackPoint = 80;
 	State->mPlayerInfo.ArmorPoint = 60;
 	State->mPlayerInfo.HP = 1000;
 	State->mPlayerInfo.HPMax = 1000;
@@ -62,6 +64,22 @@ void AKnightCharacter::BeginPlay()
 	State->mPlayerInfo.Exp = 0;
 	State->mPlayerInfo.MoveSpeed = 1000.f;
 	State->mPlayerInfo.AttackDistance = 200.f;
+
+	FSkillInfo	SkillInfo;
+	SkillInfo.SlotNumber = 0;
+	SkillInfo.SkillNumber = 0;
+	SkillInfo.Damage = 300;
+
+	// NewObject 는 생성자가 아닌 곳에서 사용한다.
+	ASkillProjectile* SkillProjectile = NewObject<ASkillProjectile>();
+
+	SkillInfo.SkillActor = Cast<ASkillActor>(SkillProjectile);
+	SkillInfo.SkillActor->SetStaticMesh(TEXT("StaticMesh'/Game/ParagonYin/FX/Meshes/Environment/Animals/SM_Bat.SM_Bat'"));
+	UProjectileMovementComponent* Projectile = SkillProjectile->GetProjectile();
+
+	Projectile->InitialSpeed = 1000.f;
+
+	mSkillInfoArray.Add(SkillInfo);
 }
 
 void AKnightCharacter::NormalAttackCheck()
@@ -121,7 +139,7 @@ void AKnightCharacter::NormalAttackCheck()
 			FActorSpawnParameters Spawnparam;
 			Spawnparam.Template = mHitActor;
 			Spawnparam.SpawnCollisionHandlingOverride =
-				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 			AParticleCascade* Particle = 
 				GetWorld()->SpawnActor<AParticleCascade>(CollisionResult[i].ImpactPoint,
@@ -134,4 +152,24 @@ void AKnightCharacter::NormalAttackCheck()
 				FDamageEvent(), GetController(), this);
 		}
 	}
+}
+
+void AKnightCharacter::Skill1()
+{
+	int32 SkillNumber = -1;
+	int32 Count = mSkillInfoArray.Num();
+
+	for (int32 i = 0; i < Count; ++i)
+	{
+		if (mSkillInfoArray[i].SlotNumber == 0)
+		{
+			SkillNumber = mSkillInfoArray[i].SkillNumber;
+			break;
+		}
+	}
+
+	if (SkillNumber == -1)
+		return;
+
+	mAnimInst->UseSkill(SkillNumber);
 }

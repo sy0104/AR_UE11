@@ -4,6 +4,7 @@
 #include "PlayerCharacter.h"
 #include "UE11PlayerState.h"
 #include "PlayerAnimInstance.h"
+#include "../Skill/SkillProjectile.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -74,6 +75,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	// 액션매핑 바인드
 	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("NormalAttack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::NormalAttack);
 	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Jump"), EInputEvent::IE_Pressed, this, &APlayerCharacter::JumpKey);
+	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Skill1"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill1Key);
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -221,8 +223,18 @@ void APlayerCharacter::JumpKey()
 	mAnimInst->Jump();
 }
 
+void APlayerCharacter::Skill1Key()
+{
+	Skill1();
+}
+
 void APlayerCharacter::NormalAttackCheck()
 {
 	
+}
+
+void APlayerCharacter::Skill1()
+{
+
 }
 
