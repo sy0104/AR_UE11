@@ -15,6 +15,9 @@ class UE11_API AKnightCharacter : public APlayerCharacter
 public:
 	AKnightCharacter();
 
+protected:
+	virtual void BeginPlay() override;
+
 public:
 	virtual void NormalAttackCheck();
 };

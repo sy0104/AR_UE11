@@ -3,6 +3,7 @@
 #pragma once
 
 #include "EngineMinimal.h"
+#include "DrawDebugHelpers.h"
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"
 
@@ -27,6 +28,81 @@ DECLARE_LOG_CATEGORY_EXTERN(UE11, Log, All);
 
 
 void PrintViewport(float Time, const FColor& Color, const FString& Text);
+
+
+UENUM(BlueprintType)
+enum class EPlayerJob : uint8
+{
+	None,
+	Knight,
+	Archer,
+	Magicion,
+	End
+};
+
+USTRUCT(BlueprintType)
+struct FCharacterInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	AttackPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	ArmorPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	HP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	HPMax;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	MP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	MPMax;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	Exp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32	Gold;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float	MoveSpeed;
+};
+
+USTRUCT(BlueprintType)
+struct FPlayerInfo : public FCharacterInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float	AttackDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EPlayerJob	Job;
+};
+
+
+USTRUCT(BlueprintType)
+struct FMonsterInfo : public FCharacterInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float	AttackDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float	TraceDistance;
+};
 
 
 

@@ -12,21 +12,45 @@ UCLASS()
 class UE11_API AUE11PlayerState : public APlayerState
 {
 	GENERATED_BODY()
-	
+
+	friend class APlayerCharacter;
+	friend class AKnightCharacter;
+
 public:
 	AUE11PlayerState();
 
 protected:
 	// Transient: 휘발성으로 저장 또는 로드가 안된다.
 	UPROPERTY(Transient)
-	float mCameraZoomMin;
+	float	mCameraZoomMin;
 
 	UPROPERTY(Transient)
-	float mCameraZoomMax;
+	float	mCameraZoomMax;
+
+	UPROPERTY(Transient)
+	FPlayerInfo		mPlayerInfo;
 
 public:
-	float GetCameraZoomMin() const { return mCameraZoomMin; }
-	float GetCameraZoomMax() const { return mCameraZoomMax; }
+	float GetCameraZoomMin() const 
+	{ 
+		return mCameraZoomMin;
+	}
+
+	float GetCameraZoomMax() const 
+	{ 
+		return mCameraZoomMax;
+	}
+
+	const FPlayerInfo GetInfo() const
+	{
+		return mPlayerInfo;
+	}
+
+public:
+	void SetAttackDistance(float Dist)
+	{
+		mPlayerInfo.AttackDistance = Dist;
+	}
 
 public:
 	void InitPlayer();

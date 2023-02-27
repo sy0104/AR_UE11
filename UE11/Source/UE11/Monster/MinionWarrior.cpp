@@ -23,4 +23,24 @@ AMinionWarrior::AMinionWarrior()
 
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -110.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimClass(TEXT("AnimBlueprint'/Game/Monster/Animation/ABMinionWarrior.ABMinionWarrior_C'"));
+
+	if (AnimClass.Succeeded())
+		GetMesh()->SetAnimInstanceClass(AnimClass.Class);
+
+
+	// MonsterInfo °ª ¼³Á¤
+	mInfo.Level = 1;
+	mInfo.Exp = 1000;
+	mInfo.Gold = 1000;
+	mInfo.AttackDistance = 150.f;
+	mInfo.AttackPoint = 50;
+	mInfo.ArmorPoint = 10;
+	mInfo.HP = 100;
+	mInfo.HPMax = 100;
+	mInfo.MP = 50;
+	mInfo.MPMax = 50;
+	mInfo.TraceDistance = 1000.f;
+	mInfo.MoveSpeed = 600.f;
 }

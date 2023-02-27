@@ -2,6 +2,8 @@
 
 
 #include "KnightCharacter.h"
+#include "UE11PlayerState.h"
+#include "../Particle/ParticleCascade.h"
 
 AKnightCharacter::AKnightCharacter()
 {
@@ -34,10 +36,102 @@ AKnightCharacter::AKnightCharacter()
 
 	if (AnimClass.Succeeded())
 		GetMesh()->SetAnimInstanceClass(AnimClass.Class);
+
+	mHitActor = CreateDefaultSubobject<AParticleCascade>(TEXT("HitParticle"));
+
+	AParticleCascade* Particle = Cast<AParticleCascade>(mHitActor);
+	Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
+	Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
+}
+
+void AKnightCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// PlayerInfo 값 설정
+	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
+	State->mPlayerInfo.AttackPoint = 150;
+	State->mPlayerInfo.ArmorPoint = 60;
+	State->mPlayerInfo.HP = 1000;
+	State->mPlayerInfo.HPMax = 1000;
+	State->mPlayerInfo.MP = 100;
+	State->mPlayerInfo.MPMax = 100;
+
+	State->mPlayerInfo.Level = 1;
+	State->mPlayerInfo.Gold = 10000;
+	State->mPlayerInfo.Exp = 0;
+	State->mPlayerInfo.MoveSpeed = 1000.f;
+	State->mPlayerInfo.AttackDistance = 200.f;
 }
 
 void AKnightCharacter::NormalAttackCheck()
 {
 	// 근접용 공격 체크
+	
+	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
+	FVector StartLocation = GetActorLocation() + GetActorForwardVector() * 30.f;
+	FVector EndLocation = StartLocation + GetActorForwardVector() * State->GetInfo().AttackDistance;
 
+	// 임시로 충돌체를 만들어서 충돌처리를 할 때는 월드 객체를 통해서 처리할 수 있다.
+	// 화면에 배치되어 있는 액터들은 월드가 다 알고 있는 상태이다.
+	// 월드 객체에게 월드 안에 있는 모든 액터들과 충돌처리를 진행해서 충돌체를 찾도록 한다.
+	// 우리가 충돌체를 실제 만드는 것이 아니라 그런 역할을 하는 함수가 제공된다.
+
+	FCollisionQueryParams param(NAME_None, false, this);
+	
+	// 원하는 액터를 추가해서 탐색에서 제외시킬 수 있다.
+	//param.AddIgnoredActor();
+
+	// 충돌 결과로 물리적인 재질 여부를 가지고 올지를 결정한다.
+	//param.bReturnPhysicalMaterial
+
+	// 복잡한 충돌에 대해서 추적해야 하는지 여부
+	//param.bTraceComplex
+
+	TArray<FHitResult> CollisionResult;
+	bool CollisionEnable = GetWorld()->SweepMultiByChannel(CollisionResult, StartLocation, EndLocation,
+		FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel3,
+		FCollisionShape::MakeSphere(50.f), param);
+
+	// 디버깅용 충돌체 그림
+#if ENABLE_DRAW_DEBUG
+
+	// CollisionEnable 가 true이면 Red, false이면 Green을 저장한다.
+	FColor DrawColor = CollisionEnable ? FColor::Red : FColor::Green;
+
+	// FRotationMatrix::MakeFromZ(GetActorForwardVector())
+	// 앞쪽을 바라보는 회전행렬을 만들어서 .ToQuat() 함수를 이용하여 회전행렬을 회전값으로 변환해준다.
+	DrawDebugCapsule(GetWorld(), (StartLocation + EndLocation) / 2.f, 
+		State->GetInfo().AttackDistance / 2.f, 50.f, 
+		FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 0.5f);
+
+#endif
+
+	if (CollisionEnable)
+	{
+		int32 Count = CollisionResult.Num();
+
+		for (int32 i = 0; i < Count; ++i)
+		{
+			// 부딪힌 위치(ImpactPoint)에 스폰해준다.
+			// 부딪힌 시점에 바라보는 방향(ImpactNormal)을 회전값으로 쓴다.
+
+			// 액터를 스폰시킬때 필요한 요소들을 지정할 수 있다.
+
+			FActorSpawnParameters Spawnparam;
+			Spawnparam.Template = mHitActor;
+			Spawnparam.SpawnCollisionHandlingOverride =
+				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+			AParticleCascade* Particle = 
+				GetWorld()->SpawnActor<AParticleCascade>(CollisionResult[i].ImpactPoint,
+				CollisionResult[i].ImpactNormal.Rotation(), Spawnparam);
+
+			// GetActor(): 부딪힌 액터를 가져온다.
+			// GetController(): 폰 종류들은 다 들고있는 종류. 폰 종류들은 컨트롤러가 빙의가 가능하기 때문에
+			// 빙의된 컨트롤러를 반환해준다.
+			CollisionResult[i].GetActor()->TakeDamage((float)State->mPlayerInfo.AttackPoint,
+				FDamageEvent(), GetController(), this);
+		}
+	}
 }

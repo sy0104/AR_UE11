@@ -37,6 +37,10 @@ APlayerCharacter::APlayerCharacter()
 	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	mHitActor = nullptr;
+
+	SetCanBeDamaged(true);
 }
 
 // Called when the game starts or when spawned
@@ -70,6 +74,14 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	// 액션매핑 바인드
 	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("NormalAttack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::NormalAttack);
 	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Jump"), EInputEvent::IE_Pressed, this, &APlayerCharacter::JumpKey);
+}
+
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	
+	return Damage;		// Can Be Damaged가 false라면 0으로 리턴된다.
 }
 
 void APlayerCharacter::MoveFront(float Scale)
