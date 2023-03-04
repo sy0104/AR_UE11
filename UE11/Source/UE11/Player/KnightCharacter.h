@@ -21,4 +21,10 @@ protected:
 public:
 	virtual void NormalAttackCheck();
 	virtual void Skill1();
+
+	virtual void UseSkill(int32 SkillNumber);
+
+public:
+	UFUNCTION()
+	void Skill1End(class ASkillActor* SkillActor, const FHitResult& Hit);
 };

@@ -17,6 +17,9 @@ public:
 	ASkillProjectile();
 
 protected:
+	virtual void BeginPlay() override;
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UProjectileMovementComponent*	mProjectile;
 
@@ -25,4 +28,8 @@ public:
 	{
 		return mProjectile;
 	}
+
+public:
+	UFUNCTION()
+	void CollisionProjectile(const FHitResult& Hit);
 };

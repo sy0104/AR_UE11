@@ -2,6 +2,7 @@
 
 
 #include "SkillActor.h"
+#include "../Particle/Decal.h"
 
 // Sets default values
 ASkillActor::ASkillActor()
@@ -23,6 +24,8 @@ ASkillActor::ASkillActor()
 	mParticle->SetupAttachment(mRoot);
 
 	mRoot->bVisualizeComponent = true;
+
+	mDecalLifeSpan = 0.f;
 }
 
 // Called when the game starts or when spawned
@@ -30,6 +33,9 @@ void ASkillActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	
+	if (IsValid(mSound))
+		UGameplayStatics::PlaySoundAtLocation(this, mSound, GetActorLocation());
 }
 
 // Called every frame
@@ -67,5 +73,58 @@ void ASkillActor::SetParticle(const FString& Path)
 void ASkillActor::SetSound(const FString& Path)
 {
 	mSound = LoadObject<USoundBase>(nullptr, *Path);
+}
+
+void ASkillActor::SetBoxExtent(const FVector& Extent)
+{
+	mRoot->SetBoxExtent(Extent);
+}
+
+void ASkillActor::SetCollisionProfile(const FName& Profile)
+{
+	mRoot->SetCollisionProfileName(Profile);
+}
+
+void ASkillActor::SetDecalTemplate(ADecal* Decal)
+{
+	mDecal = Decal;
+}
+
+void ASkillActor::CreateDecal(const FHitResult& Hit)
+{
+	// mDecal이 있으면 데칼을 생성해준다.
+	if (!IsValid(mDecal))
+		return;
+
+	FActorSpawnParameters SpawnParam;
+	SpawnParam.Template = mDecal;
+	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ADecal* Decal = GetWorld()->SpawnActor<ADecal>(
+			GetActorLocation() + GetActorForwardVector() * 100.f, GetActorRotation(), SpawnParam);
+
+	Decal->SetLifeSpan(mDecalLifeSpan);
+
+	switch (mDecal->GetSpawnType())
+	{
+	case EDecalSpawnType::Origin:
+		Decal->SetActorLocation(Hit.ImpactPoint);
+		Decal->SetDecalRotation(Hit.ImpactNormal.ToOrientationRotator());
+		break;
+	case EDecalSpawnType::Floor:
+	{
+		FCollisionQueryParams param(NAME_None, false, this);
+		FHitResult LineHit;
+
+		bool Collision = GetWorld()->LineTraceSingleByChannel(LineHit, GetActorLocation(), 
+			GetActorLocation() + FVector::DownVector * 1000.f, ECollisionChannel::ECC_Visibility, param);
+
+		if (Collision)
+		{
+			Decal->SetActorLocation(LineHit.ImpactPoint);
+		}
+	}
+		break;
+	}
 }
 

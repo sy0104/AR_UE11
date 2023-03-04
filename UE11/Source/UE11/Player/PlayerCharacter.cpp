@@ -5,6 +5,7 @@
 #include "UE11PlayerState.h"
 #include "PlayerAnimInstance.h"
 #include "../Skill/SkillProjectile.h"
+#include "../Item/WeaponActor.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -42,6 +43,8 @@ APlayerCharacter::APlayerCharacter()
 	mHitActor = nullptr;
 
 	SetCanBeDamaged(true);
+
+	mWeapon = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -76,6 +79,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("NormalAttack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::NormalAttack);
 	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Jump"), EInputEvent::IE_Pressed, this, &APlayerCharacter::JumpKey);
 	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Skill1"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill1Key);
+	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("DetachWeapon"), EInputEvent::IE_Pressed, this, &APlayerCharacter::WeaponDetach);
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -228,12 +232,26 @@ void APlayerCharacter::Skill1Key()
 	Skill1();
 }
 
+void APlayerCharacter::WeaponDetach()
+{
+	if (IsValid(mWeapon))
+	{
+		mWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		mWeapon = nullptr;
+	}
+}
+
 void APlayerCharacter::NormalAttackCheck()
 {
 	
 }
 
 void APlayerCharacter::Skill1()
+{
+
+}
+
+void APlayerCharacter::UseSkill(int32 SkillNumber)
 {
 
 }

@@ -154,5 +154,9 @@ void UPlayerAnimInstance::AnimNotify_UseSkill()
 	if (mUseSkillNumber == -1)
 		return;
 
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	if (IsValid(PlayerCharacter))
+		PlayerCharacter->UseSkill(mUseSkillNumber);
 
 }

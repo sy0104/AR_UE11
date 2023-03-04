@@ -6,6 +6,8 @@
 #include "../Particle/ParticleCascade.h"
 #include "PlayerAnimInstance.h"
 #include "../Skill/SkillProjectile.h"
+#include "../Particle/Decal.h"
+#include "../Item/WeaponActor.h"
 
 AKnightCharacter::AKnightCharacter()
 {
@@ -70,16 +72,41 @@ void AKnightCharacter::BeginPlay()
 	SkillInfo.SkillNumber = 0;
 	SkillInfo.Damage = 300;
 
+	// 박쥐 스킬
 	// NewObject 는 생성자가 아닌 곳에서 사용한다.
-	ASkillProjectile* SkillProjectile = NewObject<ASkillProjectile>();
-
+	ASkillProjectile* SkillProjectile = NewObject<ASkillProjectile>(this, ASkillProjectile::StaticClass());
 	SkillInfo.SkillActor = Cast<ASkillActor>(SkillProjectile);
-	SkillInfo.SkillActor->SetStaticMesh(TEXT("StaticMesh'/Game/ParagonYin/FX/Meshes/Environment/Animals/SM_Bat.SM_Bat'"));
-	UProjectileMovementComponent* Projectile = SkillProjectile->GetProjectile();
+	
+	SkillProjectile->SetStaticMesh(TEXT("StaticMesh'/Game/ParagonYin/FX/Meshes/Environment/Animals/SM_Bat.SM_Bat'"));
+	SkillProjectile->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Ultimate/FX/p_Ult_EnterBubble.p_Ult_EnterBubble'"));
+	SkillProjectile->SetSound(TEXT("SoundWave'/Game/Sound/Fire4.Fire4'"));
+	SkillProjectile->SetCollisionProfile(TEXT("PlayerAttack"));
+	
+	// 스킬이 종료되었을 때 호출되는 함수를 다이나믹 멀티캐스트에 등록함
+	// 스킬이 종료되었을 때는 델리게이트에 등록된 함수들을 호출해준다.
+	//SkillProjectile->AddSkillEndDelegate<AKnightCharacter>(this, &AKnightCharacter::Skill1End);
+	SkillProjectile->mOnSkillEnd.AddDynamic(this, &AKnightCharacter::Skill1End);
 
+	UProjectileMovementComponent* Projectile = SkillProjectile->GetProjectile();
 	Projectile->InitialSpeed = 1000.f;
+	Projectile->ProjectileGravityScale = 0.f;
+
+	// 데칼 원본 지정
+	ADecal* Decal = NewObject<ADecal>(this, ADecal::StaticClass());
+	Decal->SetSpawnType(EDecalSpawnType::Floor);
+	SkillProjectile->SetDecalLifeSpan(5.f);
+	SkillProjectile->SetDecalTemplate(Decal);
 
 	mSkillInfoArray.Add(SkillInfo);
+
+	// 액터를 하나 스폰시켜야 한다.
+	// 액터를 스폰시킨 다음 캐릭터 메쉬의 차일드로 붙여준다.
+	FActorSpawnParameters SpawnParam;
+	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	mWeapon = GetWorld()->SpawnActor<AWeaponActor>(AWeaponActor::StaticClass(), SpawnParam);
+	mWeapon->SetMesh(TEXT("StaticMesh'/Game/Meshes/Axe1.Axe1'"));
+	mWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("weapon_l_socket"));
 }
 
 void AKnightCharacter::NormalAttackCheck()
@@ -136,14 +163,13 @@ void AKnightCharacter::NormalAttackCheck()
 
 			// 액터를 스폰시킬때 필요한 요소들을 지정할 수 있다.
 
-			FActorSpawnParameters Spawnparam;
-			Spawnparam.Template = mHitActor;
-			Spawnparam.SpawnCollisionHandlingOverride =
-				ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			FActorSpawnParameters SpawnParam;
+			SpawnParam.Template = mHitActor;
+			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 			AParticleCascade* Particle = 
 				GetWorld()->SpawnActor<AParticleCascade>(CollisionResult[i].ImpactPoint,
-				CollisionResult[i].ImpactNormal.Rotation(), Spawnparam);
+				CollisionResult[i].ImpactNormal.Rotation(), SpawnParam);
 
 			// GetActor(): 부딪힌 액터를 가져온다.
 			// GetController(): 폰 종류들은 다 들고있는 종류. 폰 종류들은 컨트롤러가 빙의가 가능하기 때문에
@@ -172,4 +198,31 @@ void AKnightCharacter::Skill1()
 		return;
 
 	mAnimInst->UseSkill(SkillNumber);
+}
+
+void AKnightCharacter::UseSkill(int32 SkillNumber)
+{
+	int32 Count = mSkillInfoArray.Num();
+
+	for (int32 i = 0; i < Count; ++i)
+	{
+		if (mSkillInfoArray[i].SkillNumber == SkillNumber)
+		{
+			// 지금은 다른 종류의 스킬이 없어서 일단 투사체 스킬을 생성해서 발사한다.
+			FActorSpawnParameters SpawnParam;
+			SpawnParam.Template = mSkillInfoArray[i].SkillActor;
+			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			ASkillProjectile* Skill =
+				GetWorld()->SpawnActor<ASkillProjectile>(
+					GetActorLocation() + GetActorForwardVector() * 100.f, GetActorRotation(), SpawnParam);
+
+			break;
+		}
+	}
+}
+
+void AKnightCharacter::Skill1End(ASkillActor* SkillActor, const FHitResult& Hit)
+{
+	SkillActor->Destroy();
 }

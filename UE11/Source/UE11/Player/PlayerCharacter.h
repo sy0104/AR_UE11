@@ -31,6 +31,8 @@ protected:
 
 	AActor* mHitActor;
 
+	class AWeaponActor* mWeapon;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -57,8 +59,12 @@ public:
 	void NormalAttack();
 	void JumpKey();
 	void Skill1Key();
+	void WeaponDetach();
 
 public:
 	virtual void NormalAttackCheck();
 	virtual void Skill1();
+
+public:
+	virtual void UseSkill(int32 SkillNumber);
 };
