@@ -22,6 +22,10 @@ AMonster::AMonster()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;	// 스폰시에도 AI 컨트롤러가 빙의되도록
 	AIControllerClass = AMonsterAIController::StaticClass();
+
+	mAttackEnd = false;
+
+	mPatrolIndex = 1;
 }
 
 // Called when the game starts or when spawned
@@ -47,6 +51,11 @@ void AMonster::BeginPlay()
 		mInfo.MoveSpeed = Info->MoveSpeed;
 		mInfo.AttackDistance = Info->AttackDistance;
 		mInfo.TraceDistance = Info->TraceDistance;
+
+		// 이동속도를 적용한다.
+		// 앉아서 이동 시 이동속도의 반으로 지정한다.
+		GetCharacterMovement()->MaxWalkSpeed = mInfo.MoveSpeed;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = mInfo.MoveSpeed * 0.5f;
 
 		GetMesh()->SetSkeletalMesh(Info->Mesh);
 		GetMesh()->SetAnimInstanceClass(Info->MonsterAnimClass);
@@ -84,6 +93,12 @@ float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 
 		// 죽었다.
 		mAnimInst->ChangeAnim(EMonsterAnimType::Death);
+
+		// 몬스터가 죽었으면 AIController의 동작도 멈춰준다.
+		AAIController* AI = Cast<AAIController>(GetController());
+		if (IsValid(AI))
+			AI->BrainComponent->StopLogic(TEXT("Death"));
+
 		mSpawnPoint->RemoveMonster(this);
 	}
 

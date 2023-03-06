@@ -10,6 +10,15 @@ AMonsterAIController::AMonsterAIController()
 void AMonsterAIController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
+
+	if (IsValid(mAITree) && IsValid(mAIBlackboard))
+	{
+		UBlackboardComponent* BlackboardRef = Blackboard;
+		if (UseBlackboard(mAIBlackboard, BlackboardRef))
+		{
+			RunBehaviorTree(mAITree);
+		}
+	}
 }
 
 void AMonsterAIController::OnUnPossess()

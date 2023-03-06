@@ -3,6 +3,7 @@
 
 #include "MonsterSpawnPoint.h"
 #include "Monster.h"
+#include "AI/MonsterPatrolPoint.h"
 
 // Sets default values
 AMonsterSpawnPoint::AMonsterSpawnPoint()
@@ -24,6 +25,15 @@ void AMonsterSpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// SpawnPoint의 위치를 추가한다.
+	mPatrolPointLocationArray.Add(GetActorLocation());
+
+	int32 PatrolPointCount = mPatrolPointArray.Num();
+
+	for (int32 i = 0; i < PatrolPointCount; ++i)
+		mPatrolPointLocationArray.Add(mPatrolPointArray[i]->GetActorLocation());
+	
+
 	// 생성할 몬스터 클래스가 있을 경우에만 진행한다.
 	if (IsValid(mSpawnClass))
 	{
@@ -36,6 +46,8 @@ void AMonsterSpawnPoint::BeginPlay()
 			GetWorld()->SpawnActor<AMonster>(mSpawnClass, GetActorLocation(), GetActorRotation(), Spawnparam);
 
 		SpawnMonster->SetSpawnPoint(this);
+		SpawnMonster->SetPatrolPointLocation(mPatrolPointLocationArray);
+		SpawnMonster->SetPatrolDir(mPatrolDir);
 		mMonsterArray.Add(SpawnMonster);
 	}
 }

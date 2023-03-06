@@ -38,6 +38,13 @@ void ASkillActor::BeginPlay()
 		UGameplayStatics::PlaySoundAtLocation(this, mSound, GetActorLocation());
 }
 
+void ASkillActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	mOnSkillEnd.Clear();
+}
+
 // Called every frame
 void ASkillActor::Tick(float DeltaTime)
 {

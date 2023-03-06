@@ -180,6 +180,13 @@ public:
 	 
 };
 
+UENUM(BlueprintType)
+enum class EPatrolEndDir : uint8
+{
+	Progress,
+	Repeat
+};
+
 
 UCLASS()
 class UE11_API UGameInfo : public UObject

@@ -2,6 +2,7 @@
 
 
 #include "MonsterAnimInstance.h"
+#include "Monster.h"
 
 UMonsterAnimInstance::UMonsterAnimInstance()
 {
@@ -28,4 +29,16 @@ void UMonsterAnimInstance::AnimNotify_DeathEnd()
 void UMonsterAnimInstance::AnimNotify_HitEnd()
 {
 	mHitAdditive = 0.f;
+}
+
+void UMonsterAnimInstance::AnimNotify_Attack()
+{
+}
+
+void UMonsterAnimInstance::AnimNotify_AttackEnd()
+{
+	AMonster* Monster = Cast<AMonster>(TryGetPawnOwner());
+
+	if (IsValid(Monster))
+		Monster->SetAttackEnd(true);
 }

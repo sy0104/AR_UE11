@@ -25,15 +25,63 @@ protected:
 	class UMonsterAnimInstance*		mAnimInst;
 	class AMonsterSpawnPoint*		mSpawnPoint;	// 자신이 태어난 스폰 포인트를 알고있도록 한다
 
+	bool	mAttackEnd;
+
+	TArray<FVector>		mPatrolPointLocationArray;
+	EPatrolEndDir		mPatrolDir;
+	int32				mPatrolIndex;
+	float				mPatrolWaitTime;
+
 public:
+	float GetPatrolWaitTime() const
+	{
+		return mPatrolWaitTime;
+	}
+
 	const FMonsterInfo& GetMonsterInfo() const
 	{
 		return mInfo;
 	}
 
+	class UMonsterAnimInstance* GetMonsterAnimInst() const
+	{
+		return mAnimInst;
+	}
+
+	bool GetAttackEnd() const
+	{
+		return mAttackEnd;
+	}
+
+public:
 	void SetSpawnPoint(class AMonsterSpawnPoint* SpawnPoint)
 	{
 		mSpawnPoint = SpawnPoint;
+	}
+
+	void SetAttackEnd(bool AttackEnd)
+	{
+		mAttackEnd = AttackEnd;
+	}
+
+	void SetPatrolPointLocation(const TArray<FVector>& Array)
+	{
+		mPatrolPointLocationArray = Array;
+	}
+
+	void SetPatrolDir(EPatrolEndDir Dir)
+	{
+		mPatrolDir = Dir;
+	}
+
+	void AddPatrolWaitTime(float Time)
+	{
+		mPatrolWaitTime += Time;
+	}
+
+	void ClearPatrolWaitTime()
+	{
+		mPatrolWaitTime = 0.f;
 	}
 
 protected:

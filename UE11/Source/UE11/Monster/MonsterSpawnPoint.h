@@ -33,6 +33,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<class AMonster*>		mMonsterArray;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<class AMonsterPatrolPoint*>	mPatrolPointArray;	// 에디터에서 찍기 위해 만든 것
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EPatrolEndDir	mPatrolDir;
+
+	TArray<FVector>		mPatrolPointLocationArray;			// 실제 위치 정보
+
 	float	mTime;	// 시간 체크용
 
 public:
