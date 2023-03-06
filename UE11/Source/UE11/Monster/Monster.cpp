@@ -4,6 +4,8 @@
 #include "Monster.h"
 #include "MonsterAnimInstance.h"
 #include "MonsterSpawnPoint.h"
+#include "../UE11GameInstance.h"
+#include "MonsterAIController.h"
 
 // Sets default values
 AMonster::AMonster()
@@ -19,6 +21,7 @@ AMonster::AMonster()
 	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;	// 밝고 올라가지 못하도록
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;	// 스폰시에도 AI 컨트롤러가 빙의되도록
+	AIControllerClass = AMonsterAIController::StaticClass();
 }
 
 // Called when the game starts or when spawned
@@ -26,6 +29,29 @@ void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	UUE11GameInstance* GameInst = GetWorld()->GetGameInstance<UUE11GameInstance>();
+	const FMonsterTableInfo* Info = GameInst->FindMonsterTable(mMonsterTableRowName);
+
+	if (Info)
+	{
+		mInfo.Name = Info->Name;
+		mInfo.AttackPoint = Info->AttackPoint;
+		mInfo.ArmorPoint = Info->ArmorPoint;
+		mInfo.HP = Info->HP;
+		mInfo.HPMax = Info->HP;
+		mInfo.MP = Info->MP;
+		mInfo.MPMax = Info->MP;
+		mInfo.Level = Info->Level;
+		mInfo.Exp = Info->Exp;
+		mInfo.Gold = Info->Gold;
+		mInfo.MoveSpeed = Info->MoveSpeed;
+		mInfo.AttackDistance = Info->AttackDistance;
+		mInfo.TraceDistance = Info->TraceDistance;
+
+		GetMesh()->SetSkeletalMesh(Info->Mesh);
+		GetMesh()->SetAnimInstanceClass(Info->MonsterAnimClass);
+	}
+
 	mAnimInst = Cast<UMonsterAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
@@ -67,5 +93,24 @@ float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	}
 
 	return Damage;
+}
+
+void AMonster::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와 Blackboard를 지정해준다.
+	AMonsterAIController* AI = Cast<AMonsterAIController>(NewController);
+
+	if (IsValid(AI))
+	{
+		AI->SetBehaviorTree(TEXT("BehaviorTree'/Game/Monster/AI/BTMonster.BTMonster'"));
+		AI->SetBlackboard(TEXT("BlackboardData'/Game/Monster/AI/BBMonster.BBMonster'"));
+	}
+}
+
+void AMonster::UnPossessed()
+{
+	Super::UnPossessed();
 }
 

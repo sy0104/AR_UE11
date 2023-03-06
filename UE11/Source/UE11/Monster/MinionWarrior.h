@@ -15,4 +15,12 @@ class UE11_API AMinionWarrior : public AMonster
 	
 public:
 	AMinionWarrior();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
+	virtual void PossessedBy(AController* NewController);
+	virtual void UnPossessed();
 };

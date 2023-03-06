@@ -19,10 +19,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	FMonsterInfo	mInfo;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FName			mMonsterTableRowName;
+
 	class UMonsterAnimInstance*		mAnimInst;
 	class AMonsterSpawnPoint*		mSpawnPoint;	// 자신이 태어난 스폰 포인트를 알고있도록 한다
 
 public:
+	const FMonsterInfo& GetMonsterInfo() const
+	{
+		return mInfo;
+	}
+
 	void SetSpawnPoint(class AMonsterSpawnPoint* SpawnPoint)
 	{
 		mSpawnPoint = SpawnPoint;
@@ -40,4 +48,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
+public:
+	virtual void PossessedBy(AController* NewController);
+	virtual void UnPossessed();
 };
