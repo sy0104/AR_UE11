@@ -17,10 +17,11 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	USceneComponent*	mRoot;
+	USceneComponent* mRoot;
 
 	// TSubclassOf 는 템플릿으로 들어가는 타입의 UCLASS 정보를 저장하는 타입이다.
-	// class 정보를 저장해두었다가 필요시 해당 클래스 정보를 이용하여 객체를 생성할 수 있는 용도로 사용할 수 있다.
+	// Calss 정보를 저장해두었다고 필요시 해당 클래스 정보를 이용하여 객체를 생성
+	// 할 수 있는 용도로 사용할 수 있다.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TSubclassOf<class AMonster>		mSpawnClass;
 
@@ -31,26 +32,25 @@ protected:
 	int32	mSpawnCount;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	TArray<class AMonster*>		mMonsterArray;
+	TArray<class AMonster*>	mMonsterArray;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EPatrolType		mPatrolType;
+	EPatrolType	mPatrolType;
 
-	// Spline
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	USplineComponent*	mPatrolSpline;
+	USplineComponent* mPatrolSpline;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	int32			mDivideCount;
-	
+	int32	mDivideCount;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	bool			mDivideMeshVisible;
+	bool	mDivideMeshVisible;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UStaticMesh*	mDivideMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	TArray<FVector>		mSplinePoint;
+	TArray<FVector>	mSplinePoint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<FRotator>	mSplineRotation;
@@ -61,43 +61,42 @@ protected:
 	int32	mPrevDivideCount;
 	float	mPrevLength;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<UStaticMeshComponent*>	mMeshArray;
 
-	// Patrol
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	TArray<class AMonsterPatrolPoint*>	mPatrolPointArray;	// 에디터에서 찍기 위해 만든 것
+	TArray<class AMonsterPatrolPoint*>	mPatrolPointArray;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EPatrolEndDir	mPatrolDir;
 
-	TArray<FVector>		mPatrolPointLocationArray;			// 실제 위치 정보
+	TArray<FVector>		mPatrolPointLocationArray;
 
-	float	mTime;	// 시간 체크용
+	float	mTime;
 
 public:
-	float GetSplineLength() const
+	float GetSplineLength()	const
 	{
 		return mSplineLength;
 	}
-	
-	FVector GetSplinePoint(float Distance) const
-	{
-		return mPatrolSpline->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-	}
 
-	FVector GetSplinePoint(int32 Index) const
-	{
-		return mSplinePoint[Index];
-	}
-
-	const TArray<FVector>& GetSplinePointArray() const
+	const TArray<FVector>& GetSplinePointArray()	const
 	{
 		return mSplinePoint;
 	}
 
-public:
+	FVector GetSplinePoint(int32 Index)	const
+	{
+		return mSplinePoint[Index];
+	}
+
+	FVector GetSplinePoint(float Distance)	const
+	{
+		return mPatrolSpline->GetLocationAtDistanceAlongSpline(
+			Distance, ESplineCoordinateSpace::World);
+	}
+
 	void RemoveMonster(class AMonster* Monster)
 	{
 		mMonsterArray.Remove(Monster);

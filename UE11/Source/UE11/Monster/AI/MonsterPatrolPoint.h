@@ -6,8 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "MonsterPatrolPoint.generated.h"
 
-// 이 클래스는 위치 표시용으로만 사용한다.
-
 UCLASS()
 class UE11_API AMonsterPatrolPoint : public AActor
 {

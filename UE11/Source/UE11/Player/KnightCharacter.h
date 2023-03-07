@@ -7,6 +7,8 @@
 
 
 
+
+
 UCLASS()
 class UE11_API AKnightCharacter : public APlayerCharacter
 {
@@ -16,6 +18,7 @@ public:
 	AKnightCharacter();
 
 protected:
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
@@ -24,7 +27,9 @@ public:
 
 	virtual void UseSkill(int32 SkillNumber);
 
+
 public:
 	UFUNCTION()
-	void Skill1End(class ASkillActor* SkillActor, const FHitResult& Hit);
+	void Skill1End(class ASkillActor* SkillActor,
+		const FHitResult& Hit);
 };

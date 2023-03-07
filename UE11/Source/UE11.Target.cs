@@ -9,6 +9,7 @@ public class UE11Target : TargetRules
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.AddRange( new string[] { "UE11" } );
+		//IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
+		ExtraModuleNames.AddRange(new string[] { "UE11" });
 	}
 }

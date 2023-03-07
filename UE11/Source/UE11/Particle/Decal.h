@@ -9,7 +9,8 @@
 UENUM(BlueprintType)
 enum class EDecalSpawnType : uint8
 {
-	Origin, Floor
+	Origin,
+	Floor
 };
 
 UCLASS()
@@ -23,16 +24,16 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	USceneComponent*	mRoot;
+	USceneComponent* mRoot;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UDecalComponent*	mDecal;
+	UDecalComponent* mDecal;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EDecalSpawnType		mSpawnType;
+	EDecalSpawnType	mSpawnType;
 
 public:
-	EDecalSpawnType GetSpawnType() const
+	EDecalSpawnType GetSpawnType()	const
 	{
 		return mSpawnType;
 	}
@@ -44,7 +45,7 @@ public:
 
 	void SetDecalRotation(const FRotator& Rot)
 	{
-		mDecal->SetRelativeRotation(Rot); 
+		mDecal->SetRelativeRotation(Rot);
 	}
 
 protected:

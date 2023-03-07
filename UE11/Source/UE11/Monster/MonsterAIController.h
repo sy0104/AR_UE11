@@ -13,14 +13,14 @@ UCLASS()
 class UE11_API AMonsterAIController : public AAIController
 {
 	GENERATED_BODY()
-	
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UBehaviorTree* mAITree;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UBlackboardData* mAIBlackboard;
-
+	
 public:
 	AMonsterAIController();
 

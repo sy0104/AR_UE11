@@ -23,23 +23,19 @@ UCLASS()
 class UE11_API UMonsterAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
-	
-public:
-	UMonsterAnimInstance();
 
 public:
-	virtual void NativeInitializeAnimation();	// 생성될 때 초기화 용도
-	virtual void NativeUpdateAnimation(float DeltaSeconds);		// 매 프레임마다 실시간으로 호출됨
+	UMonsterAnimInstance();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EMonsterAnimType	mAnimType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	float 	mHitAdditive;
+	float	mHitAdditive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UAnimMontage* 	mHitMontage;
+	UAnimMontage* mHitMontage;
 
 public:
 	void ChangeAnim(EMonsterAnimType Anim)
@@ -59,10 +55,14 @@ public:
 			Montage_SetPosition(mHitMontage, 0.f);
 			Montage_Play(mHitMontage);
 		}
-
 	}
 
 public:
+	virtual void NativeInitializeAnimation();
+	virtual void NativeUpdateAnimation(float DeltaSeconds);
+
+public:
+	// 노티파이 함수는 void AnimNotify_노티파이이름() 의 형태로 만들어준다.
 	UFUNCTION()
 	void AnimNotify_DeathEnd();
 

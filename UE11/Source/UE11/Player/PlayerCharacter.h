@@ -2,6 +2,7 @@
 
 #pragma once
 
+// ../는 이전 폴더를 의미한다.
 #include "../GameInfo.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
@@ -20,7 +21,7 @@ protected:
 	USpringArmComponent* mSpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (AllowPrivateAccess = true))
-	UCameraComponent*	mCamera;
+	UCameraComponent* mCamera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (AllowPrivateAccess = true))
 	TArray<FSkillInfo>	mSkillInfoArray;
@@ -47,7 +48,7 @@ public:
 
 public:
 	// 축매핑 바인딩 함수
-	// 리턴타입: void 인자로 float 타입 하나를 받으면 된다.
+	// 리턴타입 : void 인자로 float 타입 하나를 받으면 된다.
 	void MoveFront(float Scale);
 	void MoveSide(float Scale);
 	void RotationCameraZ(float Scale);
@@ -55,16 +56,17 @@ public:
 	void CameraZoom(float Scale);
 
 	// 액션매핑 바인딩 함수
-	// 리턴타입: void 인자 없는 형태이다.
+	// 리턴타입 : void 인자 없는 형태이다.
 	void NormalAttack();
 	void JumpKey();
 	void Skill1Key();
 	void WeaponDetach();
 
+
 public:
 	virtual void NormalAttackCheck();
 	virtual void Skill1();
 
-public:
+
 	virtual void UseSkill(int32 SkillNumber);
 };

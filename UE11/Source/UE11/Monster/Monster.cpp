@@ -16,11 +16,11 @@ AMonster::AMonster()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
-	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
-	GetCapsuleComponent()->SetNotifyRigidBodyCollision(false);
-	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;	// 밝고 올라가지 못하도록
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
+	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;	// 스폰시에도 AI 컨트롤러가 빙의되도록
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = AMonsterAIController::StaticClass();
 
 	mAttackEnd = false;
@@ -30,40 +30,16 @@ AMonster::AMonster()
 	mPatrolWaitTime = 0.f;
 }
 
-void AMonster::NextPatrolPoint()
-{
-	mPatrolIndex += mPatrolIndexAdd;
-
-	if (mPatrolIndex == mPatrolPointLocationArray.Num())
-	{
-		switch (mPatrolDir)
-		{
-		case EPatrolEndDir::Progress:
-			mPatrolIndex = 0;
-			break;
-		case EPatrolEndDir::Repeat:
-			mPatrolIndexAdd = -1;
-			mPatrolIndex = mPatrolPointLocationArray.Num() - 2;
-			break;
-		default:
-			break;
-		}
-	}
-
-	else if (mPatrolIndex < 0)
-	{
-		mPatrolIndexAdd = 1;
-		mPatrolIndex = 1;
-	}
-}
-
 // Called when the game starts or when spawned
 void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UUE11GameInstance* GameInst = GetWorld()->GetGameInstance<UUE11GameInstance>();
-	const FMonsterTableInfo* Info = GameInst->FindMonsterTable(mMonsterTableRowName);
+
+	UUE11GameInstance* GameInst = 
+		GetWorld()->GetGameInstance<UUE11GameInstance>();
+
+	const FMonsterTableInfo* Info = 
+		GameInst->FindMonsterTable(mMonsterTableRowName);
 
 	if (Info)
 	{
@@ -82,14 +58,15 @@ void AMonster::BeginPlay()
 		mInfo.TraceDistance = Info->TraceDistance;
 
 		// 이동속도를 적용한다.
-		// 앉아서 이동 시 이동속도의 반으로 지정한다.
+		// 앉아서 이동시 이동속도의 반으로 지정한다.
 		GetCharacterMovement()->MaxWalkSpeed = mInfo.MoveSpeed;
 		GetCharacterMovement()->MaxWalkSpeedCrouched = mInfo.MoveSpeed * 0.5f;
 
 		GetMesh()->SetSkeletalMesh(Info->Mesh);
+
 		GetMesh()->SetAnimInstanceClass(Info->MonsterAnimClass);
 	}
-
+	
 	mAnimInst = Cast<UMonsterAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
@@ -97,7 +74,6 @@ void AMonster::BeginPlay()
 void AMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -107,14 +83,18 @@ void AMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float AMonster::TakeDamage(float DamageAmount, 
+	FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
 {
-	int32 Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	int32 Damage = (int32)Super::TakeDamage(DamageAmount, DamageEvent,
+		EventInstigator, DamageCauser);
+
 	Damage = Damage - mInfo.ArmorPoint;
 
-	mInfo.HP -= Damage;
-
 	Damage = Damage < 1 ? 1 : Damage;
+
+	mInfo.HP -= Damage;
 
 	if (mInfo.HP <= 0)
 	{
@@ -123,8 +103,8 @@ float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 		// 죽었다.
 		mAnimInst->ChangeAnim(EMonsterAnimType::Death);
 
-		// 몬스터가 죽었으면 AIController의 동작도 멈춰준다.
 		AAIController* AI = Cast<AAIController>(GetController());
+
 		if (IsValid(AI))
 			AI->BrainComponent->StopLogic(TEXT("Death"));
 
@@ -143,8 +123,10 @@ void AMonster::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와 Blackboard를 지정해준다.
-	AMonsterAIController* AI = Cast<AMonsterAIController>(NewController);
+	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와
+	// Blackboard를 지정해준다.
+	AMonsterAIController* AI =
+		Cast<AMonsterAIController>(NewController);
 
 	if (IsValid(AI))
 	{

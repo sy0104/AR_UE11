@@ -6,9 +6,8 @@
 #include "BehaviorTree/BTService.h"
 #include "BTService_TargetDetect.generated.h"
 
-/**
- * 
- */
+
+
 UCLASS()
 class UE11_API UBTService_TargetDetect : public UBTService
 {

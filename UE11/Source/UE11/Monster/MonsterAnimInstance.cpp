@@ -7,7 +7,6 @@
 UMonsterAnimInstance::UMonsterAnimInstance()
 {
 	mAnimType = EMonsterAnimType::Idle;
-
 	mHitAdditive = 0.f;
 }
 

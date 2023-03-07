@@ -6,11 +6,14 @@
 #include "BehaviorTree/BTDecorator.h"
 #include "BTDecorator_CheckDistance.generated.h"
 
+
 UENUM(BlueprintType)
 enum class ECheckDistanceType : uint8
 {
-	Attack, Trace
+	Attack,
+	Trace
 };
+
 
 UCLASS()
 class UE11_API UBTDecorator_CheckDistance : public UBTDecorator
@@ -22,7 +25,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	ECheckDistanceType		mCheckType;
+	ECheckDistanceType	mCheckType;
 
 protected:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const;

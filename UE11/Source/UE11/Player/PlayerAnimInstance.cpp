@@ -16,10 +16,11 @@ UPlayerAnimInstance::UPlayerAnimInstance()
 	mAnimType = EPlayerAnimType::Ground;
 
 	mGround = true;
+	mJumpLoop = false;
 
 	mFallRecoveryAdditive = 0.f;
 
-	mUseSkillNumber = -1;	// 사용하는 스킬이 없음
+	mUseSkillNumber = -1;
 }
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
@@ -31,15 +32,15 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	// 플레이어 캐릭터의 이동속도를 얻어오기 위해 플레이어부터 가져옴
-	// TryGetPawnOwner(): 이 애니메이션 인스턴스를 가지고 있는 폰을 얻어옴
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
 
 	if (IsValid(PlayerCharacter))
 	{
-		// 매 프레임마다 속도의 비율을 저장해두고 있음
-		UCharacterMovementComponent* Movement = PlayerCharacter->GetCharacterMovement();
-		mSpeedRatio = Movement->Velocity.Size() / Movement->MaxWalkSpeed;
+		UCharacterMovementComponent* Movement = 
+			PlayerCharacter->GetCharacterMovement();
+
+		mSpeedRatio = Movement->Velocity.Size() /
+			Movement->MaxWalkSpeed;
 
 		// 땅 위에 있는지를 판단한다.
 		mGround = Movement->IsMovingOnGround();
@@ -53,19 +54,21 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UPlayerAnimInstance::Attack()
 {
-	// 공격 불가능 상태일 때는 공격키를 인식할 수 없다.
+	// 공격 불가능 상태일때는 공격키를 인식할 수 없다.
 	if (!mAttackEnable)
 		return;
 
-	// 공격을 하고 있는 중에는 다시 못들어오게 하기 위해서 공격 불가능 상태로 만들어준다.
+	// 공격을 하고 있는 중에는 다시 못들어오게 하기 위해서
+	// 공격 불가능 상태로 만들어준다.
 	mAttackEnable = false;
 
-	// Montage_IsPlaying: 인자로 들어간 몽타주가 재생되고 있는지 판단해준다.
+	// Montage_IsPlaying : 인자로 들어간 몽타주가 재생되고 있는지
+	// 판단해준다.
 	if (!Montage_IsPlaying(mAttackMontageArray[mAttackIndex]))
 	{
-		// 모션이 재생되는 위치를 내가 임의로 지정할 수 있음
-		Montage_SetPosition(mAttackMontageArray[mAttackIndex], 0.f);	// 시작 위치부터
-		Montage_Play(mAttackMontageArray[mAttackIndex]);	// 재생 속도 설정 가능
+		Montage_SetPosition(mAttackMontageArray[mAttackIndex],
+			0.f);
+		Montage_Play(mAttackMontageArray[mAttackIndex]);
 
 		mAttackIndex = (mAttackIndex + 1) % mAttackMontageArray.Num();
 		mAttack = true;
@@ -82,7 +85,7 @@ void UPlayerAnimInstance::Jump()
 
 void UPlayerAnimInstance::UseSkill(int32 SkillNumber)
 {
-	int32 Count = mSkillMontageArray.Num();
+	int32	Count = mSkillMontageArray.Num();
 
 	for (int32 i = 0; i < Count; ++i)
 	{
@@ -92,10 +95,10 @@ void UPlayerAnimInstance::UseSkill(int32 SkillNumber)
 
 			if (!Montage_IsPlaying(mSkillMontageArray[i].Montage))
 			{
-				Montage_SetPosition(mSkillMontageArray[i].Montage, 0.f);
+				Montage_SetPosition(mSkillMontageArray[i].Montage,
+					0.f);
 				Montage_Play(mSkillMontageArray[i].Montage);
 			}
-
 			break;
 		}
 	}
@@ -106,9 +109,7 @@ void UPlayerAnimInstance::AnimNotify_Attack()
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
 
 	if (IsValid(PlayerCharacter))
-	{
 		PlayerCharacter->NormalAttackCheck();
-	}
 }
 
 void UPlayerAnimInstance::AnimNotify_AttackEnable()
@@ -138,7 +139,8 @@ void UPlayerAnimInstance::AnimNotify_FallEnd()
 	{
 		mFallRecoveryAdditive = 1.f;
 
-		Montage_SetPosition(mFallRecoveryMontage, 0.f);
+		Montage_SetPosition(mFallRecoveryMontage,
+			0.f);
 		Montage_Play(mFallRecoveryMontage);
 	}
 }
@@ -158,5 +160,4 @@ void UPlayerAnimInstance::AnimNotify_UseSkill()
 
 	if (IsValid(PlayerCharacter))
 		PlayerCharacter->UseSkill(mUseSkillNumber);
-
 }

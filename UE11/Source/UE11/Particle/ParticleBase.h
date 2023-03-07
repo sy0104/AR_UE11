@@ -17,7 +17,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UAudioComponent*	mAudio;
+	UAudioComponent* mAudio;
 
 protected:
 	// Called when the game starts or when spawned

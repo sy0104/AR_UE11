@@ -5,7 +5,9 @@
 #include "ItemActor.h"
 #include "WeaponActor.generated.h"
 
-
+/**
+ * 
+ */
 UCLASS()
 class UE11_API AWeaponActor : public AItemActor
 {

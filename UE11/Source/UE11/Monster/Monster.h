@@ -20,12 +20,13 @@ protected:
 	FMonsterInfo	mInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	FName			mMonsterTableRowName;
+	FName		mMonsterTableRowName;
 
-	class UMonsterAnimInstance*		mAnimInst;
-	class AMonsterSpawnPoint*		mSpawnPoint;	// 자신이 태어난 스폰 포인트를 알고있도록 한다
+	class UMonsterAnimInstance* mAnimInst;
 
-	bool	mAttackEnd;
+	class AMonsterSpawnPoint* mSpawnPoint;
+
+	bool		mAttackEnd;
 
 	TArray<FVector>		mPatrolPointLocationArray;
 	EPatrolEndDir		mPatrolDir;
@@ -34,60 +35,60 @@ protected:
 	float				mPatrolWaitTime;
 
 public:
-	float GetPatrolWaitTime() const
+	bool GetPatrolEnable()	const
+	{
+		return mPatrolPointLocationArray.Num() >= 2;
+	}
+
+	const FVector& GetPatrolLocation()	const
+	{
+		return mPatrolPointLocationArray[mPatrolIndex];
+	}
+
+	float GetPatrolWaitTime()	const
 	{
 		return mPatrolWaitTime;
 	}
 
-	const FMonsterInfo& GetMonsterInfo() const
-	{
-		return mInfo;
-	}
-
-	class UMonsterAnimInstance* GetMonsterAnimInst() const
-	{
-		return mAnimInst;
-	}
-
-	bool GetAttackEnd() const
+	bool GetAttackEnd()	const
 	{
 		return mAttackEnd;
 	}
 
-	const FVector& GetPatrolLocation() const
+	const FMonsterInfo& GetMonsterInfo()	const
 	{
-		return mPatrolPointLocationArray[mPatrolIndex];	// 현재 이동해야 하는 지점의 위치 반환
+		return mInfo;
 	}
 
-	bool GetPatrolEnable() const
+	class UMonsterAnimInstance* GetMonsterAnimInst()	const
 	{
-		return mPatrolPointLocationArray.Num() >= 2;	// 지점이 1개라면 patrol을 할 수 없다.
+		return mAnimInst;
 	}
 
 public:
-	void SetSpawnPoint(class AMonsterSpawnPoint* SpawnPoint)
+	void NextPatrolPoint()
 	{
-		mSpawnPoint = SpawnPoint;
-	}
+		mPatrolIndex += mPatrolIndexAdd;
 
-	void SetAttackEnd(bool AttackEnd)
-	{
-		mAttackEnd = AttackEnd;
-	}
+		if (mPatrolIndex == mPatrolPointLocationArray.Num())
+		{
+			switch (mPatrolDir)
+			{
+			case EPatrolEndDir::Progress:
+				mPatrolIndex = 0;
+				break;
+			case EPatrolEndDir::Repeat:
+				mPatrolIndexAdd = -1;
+				mPatrolIndex = mPatrolPointLocationArray.Num() - 2;
+				break;
+			}
+		}
 
-	void SetPatrolPointLocation(const TArray<FVector>& Array)
-	{
-		mPatrolPointLocationArray = Array;
-	}
-
-	void SetPatrolDir(EPatrolEndDir Dir)
-	{
-		mPatrolDir = Dir;
-	}
-
-	void AddPatrolWaitTime(float Time)
-	{
-		mPatrolWaitTime += Time;
+		else if (mPatrolIndex < 0)
+		{
+			mPatrolIndexAdd = 1;
+			mPatrolIndex = 1;
+		}
 	}
 
 	void ClearPatrolWaitTime()
@@ -95,7 +96,30 @@ public:
 		mPatrolWaitTime = 0.f;
 	}
 
-	void NextPatrolPoint();
+	void AddPatrolWaitTime(float Time)
+	{
+		mPatrolWaitTime += Time;
+	}
+
+	void SetPatrolDir(EPatrolEndDir Dir)
+	{
+		mPatrolDir = Dir;
+	}
+
+	void SetPatrolPointLocation(const TArray<FVector>& Array)
+	{
+		mPatrolPointLocationArray = Array;
+	}
+
+	void SetAttackEnd(bool AttackEnd)
+	{
+		mAttackEnd = AttackEnd;
+	}
+
+	void SetSpawnPoint(class AMonsterSpawnPoint* SpawnPoint)
+	{
+		mSpawnPoint = SpawnPoint;
+	}
 
 protected:
 	// Called when the game starts or when spawned

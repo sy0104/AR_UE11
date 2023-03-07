@@ -17,17 +17,17 @@ public:
 	ASkillProjectile();
 
 protected:
-	virtual void BeginPlay() override;
-
-protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UProjectileMovementComponent*	mProjectile;
+	UProjectileMovementComponent* mProjectile;
 
 public:
-	UProjectileMovementComponent* GetProjectile() const
+	UProjectileMovementComponent* GetProjectile()	const
 	{
 		return mProjectile;
 	}
+
+protected:
+	virtual void BeginPlay() override;
 
 public:
 	UFUNCTION()

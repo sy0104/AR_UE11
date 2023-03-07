@@ -33,6 +33,8 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->JumpZVelocity = 750.f;
 
 	mDeath = false;
+	//JumpMaxCount = 10;
+	//JumpMaxHoldTime = 3.f;
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
@@ -51,7 +53,7 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	mAnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
@@ -59,8 +61,6 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//PrintViewport(1.f, FColor::Red, GetCharacterMovement()->Velocity.ToString());
 }
 
 // Called to bind functionality to input
@@ -68,26 +68,50 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// 축매핑 바인드
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("MoveFront"), this, &APlayerCharacter::MoveFront);
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("MoveSide"), this, &APlayerCharacter::MoveSide);
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("RotationCameraZ"), this, &APlayerCharacter::RotationCameraZ);
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("RotationCameraY"), this, &APlayerCharacter::RotationCameraY);
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("CameraZoom"), this, &APlayerCharacter::CameraZoom);
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("MoveFront"),
+		this, &APlayerCharacter::MoveFront);
 
-	// 액션매핑 바인드
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("NormalAttack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::NormalAttack);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Jump"), EInputEvent::IE_Pressed, this, &APlayerCharacter::JumpKey);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Skill1"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill1Key);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("DetachWeapon"), EInputEvent::IE_Pressed, this, &APlayerCharacter::WeaponDetach);
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("MoveSide"),
+		this, &APlayerCharacter::MoveSide);
+
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("RotationCameraZ"),
+		this, &APlayerCharacter::RotationCameraZ);
+
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("RotationCameraY"),
+		this, &APlayerCharacter::RotationCameraY);
+
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("CameraZoom"),
+		this, &APlayerCharacter::CameraZoom);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("NormalAttack"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::NormalAttack);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("Jump"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::JumpKey);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("Skill1"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::Skill1Key);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("DetachWeapon"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::WeaponDetach);
 }
 
-float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float APlayerCharacter::TakeDamage(float DamageAmount, 
+	FDamageEvent const& DamageEvent, AController* EventInstigator, 
+	AActor* DamageCauser)
 {
-	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent,
+		EventInstigator, DamageCauser);
 
-	
-	return Damage;		// Can Be Damaged가 false라면 0으로 리턴된다.
+	return Damage;
 }
 
 void APlayerCharacter::MoveFront(float Scale)
@@ -100,8 +124,9 @@ void APlayerCharacter::MoveFront(float Scale)
 	if (Scale == 0.f)
 		return;
 
-	// AddMovementInput: 캐릭터 클래스에서 캐릭터 무브먼트 컴포넌트를 이용하여 이동하는 기능을 만들어놓은 함수이다.
-	// GetActorForwardVector(): 이 액터의 전방 방향벡터를 얻어온다.
+	// AddMovementInput : 캐릭터 클래스에서 캐릭터 무브먼트 컴포넌트를
+	// 이용하여 이동하는 기능을 만들어놓은 함수이다.
+	// GetActorForwardVector() : 이 액터의 전방 방향벡터를 얻어온다.
 	AddMovementInput(GetActorForwardVector(), Scale);
 }
 
@@ -159,15 +184,20 @@ void APlayerCharacter::MoveSide(float Scale)
 		return;
 
 	// AddMovementInput : 캐릭터 클래스에서 캐릭터 무브먼트 컴포넌트를
+	// 이용하여 이동하는 기능을 만들어놓은 함수이다.
 	// GetActorRightVector() : 이 액터의 오른쪽 방향벡터를 얻어온다.
 	AddMovementInput(GetActorRightVector(), Scale);
 }
 
 void APlayerCharacter::RotationCameraZ(float Scale)
 {
-	if (mDeath || Scale == 0.f)
+	if (mDeath)
 		return;
 
+	if (Scale == 0.f)
+		return;
+
+	//mSpringArm->AddRelativeRotation(FRotator(0.f, Scale * 180.f * GetWorld()->GetDeltaSeconds(), 0.f));
 	AddControllerYawInput(Scale * 180.f * GetWorld()->GetDeltaSeconds());
 }
 
@@ -185,12 +215,14 @@ void APlayerCharacter::CameraZoom(float Scale)
 		return;
 
 	PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("Scale : %.5f"), Scale));
+
 	mSpringArm->TargetArmLength += Scale * -5.f;
 
-	// Cast: 해당 타입일 경우 해당 메모리 주소를 형변환하여 반환하고 아닐 경우 nulptr을 반환한다.
+	// Cast : 해당 타입일 경우 해당 메모리 주소를 형변환하여 반환하고
+	// 아닐 경우 nullptr을 반환한다.
 	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
 
-	float CameraZoomMin = 100.f, CameraZoomMax = 500.f;
+	float	CameraZoomMin = 100.f, CameraZoomMax = 500.f;
 
 	// State가 있을 경우 해당 값을 받아서 사용한다.
 	if (IsValid(State))
@@ -202,7 +234,7 @@ void APlayerCharacter::CameraZoom(float Scale)
 	if (mSpringArm->TargetArmLength < CameraZoomMin)
 		mSpringArm->TargetArmLength = CameraZoomMin;
 
-	if (mSpringArm->TargetArmLength > CameraZoomMax)
+	else if (mSpringArm->TargetArmLength > CameraZoomMax)
 		mSpringArm->TargetArmLength = CameraZoomMax;
 }
 
@@ -219,7 +251,7 @@ void APlayerCharacter::JumpKey()
 	if (mDeath)
 		return;
 
-	// 살아있을 경우 땅 위에 있을 때 점프가 가능하도록 한다.
+	// 살아있을 경우 땅 위에 있을때 점프가 가능하도록 한다.
 	else if (mAnimInst->GetPlayerAnimType() != EPlayerAnimType::Ground)
 		return;
 
@@ -236,6 +268,7 @@ void APlayerCharacter::WeaponDetach()
 {
 	if (IsValid(mWeapon))
 	{
+		PrintViewport(1.f, FColor::Red, TEXT("detach"));
 		mWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		mWeapon = nullptr;
 	}
@@ -243,16 +276,12 @@ void APlayerCharacter::WeaponDetach()
 
 void APlayerCharacter::NormalAttackCheck()
 {
-	
 }
 
 void APlayerCharacter::Skill1()
 {
-
 }
 
 void APlayerCharacter::UseSkill(int32 SkillNumber)
 {
-
 }
-

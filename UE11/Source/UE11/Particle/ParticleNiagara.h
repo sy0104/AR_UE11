@@ -5,7 +5,9 @@
 #include "ParticleBase.h"
 #include "ParticleNiagara.generated.h"
 
-
+/**
+ * 
+ */
 UCLASS()
 class UE11_API AParticleNiagara : public AParticleBase
 {
