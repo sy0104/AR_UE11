@@ -10,6 +10,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/SplineComponent.h"
 
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"
@@ -186,6 +187,14 @@ enum class EPatrolEndDir : uint8
 	Progress,
 	Repeat
 };
+
+UENUM(BlueprintType)
+enum class EPatrolType : uint8
+{
+	Point,
+	Spline
+};
+
 
 
 UCLASS()

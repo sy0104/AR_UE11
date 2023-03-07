@@ -39,6 +39,10 @@ EBTNodeResult::Type UBTTask_TargetTrace::ExecuteTask(UBehaviorTreeComponent& Own
 		return EBTNodeResult::Failed;
 	}
 
+	const FMonsterInfo& Info = Monster->GetMonsterInfo();
+	Monster->GetCharacterMovement()->MaxWalkSpeed = Info.MoveSpeed;
+
+
 	// 타겟 위치로 이동시킨다.
 	UAIBlueprintHelperLibrary::SimpleMoveToActor(Controller, Target);
 

@@ -34,6 +34,39 @@ protected:
 	TArray<class AMonster*>		mMonsterArray;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EPatrolType		mPatrolType;
+
+	// Spline
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	USplineComponent*	mPatrolSpline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32			mDivideCount;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	bool			mDivideMeshVisible;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UStaticMesh*	mDivideMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FVector>		mSplinePoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FRotator>	mSplineRotation;
+
+	float	mSplineLength;
+	float	mCellDistance;
+
+	int32	mPrevDivideCount;
+	float	mPrevLength;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<UStaticMeshComponent*>	mMeshArray;
+
+	// Patrol
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<class AMonsterPatrolPoint*>	mPatrolPointArray;	// 에디터에서 찍기 위해 만든 것
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
@@ -44,10 +77,34 @@ protected:
 	float	mTime;	// 시간 체크용
 
 public:
+	float GetSplineLength() const
+	{
+		return mSplineLength;
+	}
+	
+	FVector GetSplinePoint(float Distance) const
+	{
+		return mPatrolSpline->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+	}
+
+	FVector GetSplinePoint(int32 Index) const
+	{
+		return mSplinePoint[Index];
+	}
+
+	const TArray<FVector>& GetSplinePointArray() const
+	{
+		return mSplinePoint;
+	}
+
+public:
 	void RemoveMonster(class AMonster* Monster)
 	{
 		mMonsterArray.Remove(Monster);
 	}
+
+public:
+	virtual void OnConstruction(const FTransform& Transform);
 
 protected:
 	// Called when the game starts or when spawned
@@ -57,4 +114,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	UFUNCTION()
+	void ComputeSpline();
 };

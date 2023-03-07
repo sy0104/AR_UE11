@@ -26,6 +26,35 @@ AMonster::AMonster()
 	mAttackEnd = false;
 
 	mPatrolIndex = 1;
+	mPatrolIndexAdd = 1;
+	mPatrolWaitTime = 0.f;
+}
+
+void AMonster::NextPatrolPoint()
+{
+	mPatrolIndex += mPatrolIndexAdd;
+
+	if (mPatrolIndex == mPatrolPointLocationArray.Num())
+	{
+		switch (mPatrolDir)
+		{
+		case EPatrolEndDir::Progress:
+			mPatrolIndex = 0;
+			break;
+		case EPatrolEndDir::Repeat:
+			mPatrolIndexAdd = -1;
+			mPatrolIndex = mPatrolPointLocationArray.Num() - 2;
+			break;
+		default:
+			break;
+		}
+	}
+
+	else if (mPatrolIndex < 0)
+	{
+		mPatrolIndexAdd = 1;
+		mPatrolIndex = 1;
+	}
 }
 
 // Called when the game starts or when spawned

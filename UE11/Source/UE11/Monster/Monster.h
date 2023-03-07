@@ -30,6 +30,7 @@ protected:
 	TArray<FVector>		mPatrolPointLocationArray;
 	EPatrolEndDir		mPatrolDir;
 	int32				mPatrolIndex;
+	int32				mPatrolIndexAdd;
 	float				mPatrolWaitTime;
 
 public:
@@ -51,6 +52,16 @@ public:
 	bool GetAttackEnd() const
 	{
 		return mAttackEnd;
+	}
+
+	const FVector& GetPatrolLocation() const
+	{
+		return mPatrolPointLocationArray[mPatrolIndex];	// 현재 이동해야 하는 지점의 위치 반환
+	}
+
+	bool GetPatrolEnable() const
+	{
+		return mPatrolPointLocationArray.Num() >= 2;	// 지점이 1개라면 patrol을 할 수 없다.
 	}
 
 public:
@@ -83,6 +94,8 @@ public:
 	{
 		mPatrolWaitTime = 0.f;
 	}
+
+	void NextPatrolPoint();
 
 protected:
 	// Called when the game starts or when spawned
