@@ -28,6 +28,35 @@ AMonster::AMonster()
 	mPatrolIndex = 1;
 	mPatrolIndexAdd = 1;
 	mPatrolWaitTime = 0.f;
+
+	mPatrolEnable = false;
+	mPatrolCurrentDistance = 0.f;
+}
+
+FVector AMonster::GetPatrolLocation() const
+{
+	switch (mPatrolType)
+	{
+	case EPatrolType::Point:
+		return mPatrolPointLocationArray[mPatrolIndex];
+	case EPatrolType::Spline:
+		return mSpawnPoint->GetSplinePoint(mPatrolCurrentDistance);
+	}
+
+	return FVector::ZeroVector;
+}
+
+FVector AMonster::GetPatrolPointLocation() const
+{
+	switch (mPatrolType)
+	{
+	case EPatrolType::Point:
+		return mPatrolPointLocationArray[mPatrolIndex];
+	case EPatrolType::Spline:
+		return mSpawnPoint->GetSplinePoint(mPatrolIndex * mPatrolCellDistance);
+	}
+
+	return FVector::ZeroVector;
 }
 
 // Called when the game starts or when spawned
@@ -74,6 +103,29 @@ void AMonster::BeginPlay()
 void AMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// 현재 패트롤 상태일 경우 속도벡터를 이용하여 이동양을 구한다.
+	if (mPatrolEnable)
+	{
+		// 현재 도착지점의 인덱스를 이용해서 그 값을 넘어갈 경우 해당 값으로
+		// 고정하여 거기까지만 이동할 수 있도록 한다.
+		mPatrolCurrentDistance += (GetCharacterMovement()->MaxWalkSpeed *
+			DeltaTime * mPatrolIndexAdd);
+
+		if (GetArrive())
+		{
+			if (mPatrolIndexAdd == 1)
+			{
+				mPatrolCurrentDistance = mPatrolIndex * mPatrolCellDistance;
+			}
+
+			else
+			{
+				mPatrolCurrentDistance = mPatrolIndex * mPatrolCellDistance;
+			}
+			mPatrolEnable = false;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -140,3 +192,6 @@ void AMonster::UnPossessed()
 	Super::UnPossessed();
 }
 
+void AMonster::Attack()
+{
+}

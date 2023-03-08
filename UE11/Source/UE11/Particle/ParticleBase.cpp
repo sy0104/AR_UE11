@@ -28,13 +28,18 @@ void AParticleBase::Tick(float DeltaTime)
 
 }
 
-void AParticleBase::SetSound(const FString& Path)
+void AParticleBase::SetSound(const FString& Path, bool Play)
 {
 	USoundBase* Sound = LoadObject<USoundBase>(
 		nullptr, *Path);
 
 	if (IsValid(Sound))
+	{
 		mAudio->SetSound(Sound);
+
+		if (Play)
+			mAudio->Play();
+	}
 }
 
 void AParticleBase::SetParticle(const FString& Path)

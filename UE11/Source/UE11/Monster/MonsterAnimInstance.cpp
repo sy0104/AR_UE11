@@ -32,6 +32,10 @@ void UMonsterAnimInstance::AnimNotify_HitEnd()
 
 void UMonsterAnimInstance::AnimNotify_Attack()
 {
+	AMonster* Monster = Cast<AMonster>(TryGetPawnOwner());
+
+	if (IsValid(Monster))
+		Monster->Attack();
 }
 
 void UMonsterAnimInstance::AnimNotify_AttackEnd()

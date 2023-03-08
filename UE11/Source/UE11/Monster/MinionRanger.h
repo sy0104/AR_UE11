@@ -3,18 +3,21 @@
 #pragma once
 
 #include "Monster.h"
-#include "MinionWarrior.generated.h"
+#include "MinionRanger.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UE11_API AMinionWarrior : public AMonster
+class UE11_API AMinionRanger : public AMonster
 {
 	GENERATED_BODY()
-	
+
 public:
-	AMinionWarrior();
+	AMinionRanger();
+
+protected:
+	AActor* mMuzzleParticle;
 
 protected:
 	// Called when the game starts or when spawned

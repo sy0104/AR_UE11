@@ -17,10 +17,14 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	FMonsterInfo	mInfo;
+		FMonsterInfo	mInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	FName		mMonsterTableRowName;
+		FName		mMonsterTableRowName;
+
+	AActor* mHitActor;
+
+	EPatrolType	mPatrolType;
 
 	class UMonsterAnimInstance* mAnimInst;
 
@@ -34,16 +38,49 @@ protected:
 	int32				mPatrolIndexAdd;
 	float				mPatrolWaitTime;
 
+	bool				mPatrolEnable;
+
+	int32				mPatrolSplineCount;
+	float				mPatrolSplineLength;
+	float				mPatrolCellDistance;
+	float				mPatrolCurrentDistance;
+
+	float				mPatrolTime;
+	float				mPatrolTimeAcc;
+
 public:
+	bool GetArrive()	const
+	{
+		float	Dist = 10.f + GetCapsuleComponent()->GetScaledCapsuleRadius();
+
+		if (mPatrolIndexAdd == 1)
+			return mPatrolIndex * mPatrolCellDistance - Dist <= mPatrolCurrentDistance;
+
+		return mPatrolIndex * mPatrolCellDistance + Dist >= mPatrolCurrentDistance;
+	}
+
+	int32 GetPatrolSplineCount()	const
+	{
+		return mPatrolSplineCount;
+	}
+
+	float GetPatrolSplineLength()	const
+	{
+		return mPatrolSplineLength;
+	}
+
+	EPatrolType GetPatrolType()	const
+	{
+		return mPatrolType;
+	}
+
 	bool GetPatrolEnable()	const
 	{
 		return mPatrolPointLocationArray.Num() >= 2;
 	}
 
-	const FVector& GetPatrolLocation()	const
-	{
-		return mPatrolPointLocationArray[mPatrolIndex];
-	}
+	FVector GetPatrolLocation()	const;
+	FVector GetPatrolPointLocation()	const;
 
 	float GetPatrolWaitTime()	const
 	{
@@ -66,28 +103,84 @@ public:
 	}
 
 public:
+	void SetPatrolEnable(bool Enable)
+	{
+		mPatrolEnable = Enable;
+	}
+
+	void SetPatrolSplineCount(int32 Count)
+	{
+		mPatrolSplineCount = Count;
+	}
+
+	void SetPatrolCellDistance(float Length)
+	{
+		mPatrolCellDistance = Length;
+	}
+
+	void SetPatrolSplineLength(float Length)
+	{
+		mPatrolSplineLength = Length;
+	}
+
+	void SetPatrolType(EPatrolType Type)
+	{
+		mPatrolType = Type;
+	}
+
 	void NextPatrolPoint()
 	{
 		mPatrolIndex += mPatrolIndexAdd;
 
-		if (mPatrolIndex == mPatrolPointLocationArray.Num())
+		switch (mPatrolType)
 		{
-			switch (mPatrolDir)
+		case EPatrolType::Point:
+			if (mPatrolIndex == mPatrolPointLocationArray.Num())
 			{
-			case EPatrolEndDir::Progress:
-				mPatrolIndex = 0;
-				break;
-			case EPatrolEndDir::Repeat:
-				mPatrolIndexAdd = -1;
-				mPatrolIndex = mPatrolPointLocationArray.Num() - 2;
-				break;
+				switch (mPatrolDir)
+				{
+				case EPatrolEndDir::Progress:
+					mPatrolIndex = 0;
+					break;
+				case EPatrolEndDir::Repeat:
+					mPatrolIndexAdd = -1;
+					mPatrolIndex = mPatrolPointLocationArray.Num() - 2;
+					break;
+				}
 			}
-		}
 
-		else if (mPatrolIndex < 0)
-		{
-			mPatrolIndexAdd = 1;
-			mPatrolIndex = 1;
+			else if (mPatrolIndex < 0)
+			{
+				mPatrolIndexAdd = 1;
+				mPatrolIndex = 1;
+			}
+			break;
+		case EPatrolType::Spline:
+			if (mPatrolIndex == mPatrolSplineCount + 1)
+			{
+				switch (mPatrolDir)
+				{
+				case EPatrolEndDir::Progress:
+					mPatrolIndex = 1;
+					mPatrolCurrentDistance -= mPatrolSplineLength;
+					break;
+				case EPatrolEndDir::Repeat:
+					mPatrolCurrentDistance = mPatrolSplineLength - 100.f -
+						GetCapsuleComponent()->GetScaledCapsuleRadius();
+					mPatrolIndexAdd = -1;
+					mPatrolIndex = mPatrolSplineCount - 1;
+					break;
+				}
+			}
+
+			else if (mPatrolIndex < 0)
+			{
+				mPatrolCurrentDistance = 100.f +
+					GetCapsuleComponent()->GetScaledCapsuleRadius();
+				mPatrolIndexAdd = 1;
+				mPatrolIndex = 1;
+			}
+			break;
 		}
 	}
 
@@ -136,4 +229,7 @@ public:
 public:
 	virtual void PossessedBy(AController* NewController);
 	virtual void UnPossessed();
+
+public:
+	virtual void Attack();
 };

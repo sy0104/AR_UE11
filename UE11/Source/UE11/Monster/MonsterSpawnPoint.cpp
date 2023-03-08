@@ -26,7 +26,7 @@ AMonsterSpawnPoint::AMonsterSpawnPoint()
 
 	mPatrolType = EPatrolType::Point;
 
-	mDivideCount = 100;
+	mDivideCount = 5;
 	mDivideMeshVisible = true;
 	mSplineLength = 0.f;
 	mCellDistance = 0.f;
@@ -50,6 +50,9 @@ void AMonsterSpawnPoint::OnConstruction(const FTransform& Transform)
 void AMonsterSpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
+
+	mSplineLength = mPatrolSpline->GetSplineLength();
+	mCellDistance = mSplineLength / mDivideCount;
 
 	// SpawnPoint의 위치를 추가한다.
 	mPatrolPointLocationArray.Add(GetActorLocation());
@@ -78,6 +81,10 @@ void AMonsterSpawnPoint::BeginPlay()
 		SpawnMonster->SetSpawnPoint(this);
 		SpawnMonster->SetPatrolPointLocation(mPatrolPointLocationArray);
 		SpawnMonster->SetPatrolDir(mPatrolDir);
+		SpawnMonster->SetPatrolType(mPatrolType);
+		SpawnMonster->SetPatrolSplineLength(mSplineLength);
+		SpawnMonster->SetPatrolCellDistance(mCellDistance);
+		SpawnMonster->SetPatrolSplineCount(mDivideCount);
 
 		mMonsterArray.Add(SpawnMonster);
 	}
@@ -113,6 +120,10 @@ void AMonsterSpawnPoint::Tick(float DeltaTime)
 				SpawnMonster->SetSpawnPoint(this);
 				SpawnMonster->SetPatrolPointLocation(mPatrolPointLocationArray);
 				SpawnMonster->SetPatrolDir(mPatrolDir);
+				SpawnMonster->SetPatrolType(mPatrolType);
+				SpawnMonster->SetPatrolSplineLength(mSplineLength);
+				SpawnMonster->SetPatrolCellDistance(mCellDistance);
+				SpawnMonster->SetPatrolSplineCount(mDivideCount);
 
 				mMonsterArray.Add(SpawnMonster);
 

@@ -54,7 +54,7 @@ AKnightCharacter::AKnightCharacter()
 
 	AParticleCascade* Particle = Cast<AParticleCascade>(mHitActor);
 	Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
-	Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
+	Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"), false);
 }
 
 void AKnightCharacter::BeginPlay()
@@ -196,7 +196,7 @@ void AKnightCharacter::NormalAttackCheck()
 			액터를 스폰시키는 방법을 지정한다.
 			*/
 			FActorSpawnParameters	SpawnParam;
-			SpawnParam.Template = mHitActor;
+			//SpawnParam.Template = mHitActor;
 			SpawnParam.SpawnCollisionHandlingOverride =
 				ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -205,6 +205,9 @@ void AKnightCharacter::NormalAttackCheck()
 				CollisionResult[i].ImpactPoint,
 				CollisionResult[i].ImpactNormal.Rotation(),
 					SpawnParam);
+
+			Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
+			Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
 
 			CollisionResult[i].GetActor()->TakeDamage(
 				(float)State->mPlayerInfo.AttackPoint,

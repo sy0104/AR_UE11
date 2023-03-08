@@ -28,6 +28,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	void SetSound(const FString& Path);
+	void SetSound(const FString& Path, bool Play = true);
 	virtual void SetParticle(const FString& Path);
 };
