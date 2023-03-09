@@ -18,6 +18,9 @@ public:
 	AUE11PlayerController();
 
 protected:
+	class ADecal* mMousePick;
+
+protected:
 	virtual void BeginPlay() override;
 
 public:
@@ -28,4 +31,7 @@ public:
 protected:
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void OnUnPossess() override;
+
+public:
+	void SpawnMousePick();
 };

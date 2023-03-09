@@ -15,9 +15,7 @@ AMonsterSpawnPoint::AMonsterSpawnPoint()
 	mPatrolSpline = CreateDefaultSubobject<USplineComponent>(TEXT("PatrolSpline"));
 
 	SetRootComponent(mRoot);
-
 	mPatrolSpline->SetupAttachment(mRoot);
-
 	mRoot->bVisualizeComponent = true;
 
 	mSpawnTime = 3.f;
@@ -67,16 +65,13 @@ void AMonsterSpawnPoint::BeginPlay()
 	// 생성할 몬스터 클래스가 있을 경우에만 진행한다.
 	if (IsValid(mSpawnClass))
 	{
-		mSpawnCount = mSpawnCount < 1 ? 1 : mSpawnCount;
+		mSpawnCount = mSpawnCount < 1 ? 1 : mSpawnCount;	// mSpawnCount는 0보다 작을 수 없다.
 
 		FActorSpawnParameters	SpawnParam;
-		SpawnParam.SpawnCollisionHandlingOverride =
-			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 		AMonster* SpawnMonster =
-			GetWorld()->SpawnActor<AMonster>(mSpawnClass,
-				GetActorLocation(), GetActorRotation(),
-				SpawnParam);
+			GetWorld()->SpawnActor<AMonster>(mSpawnClass, GetActorLocation(), GetActorRotation(), SpawnParam);
 
 		SpawnMonster->SetSpawnPoint(this);
 		SpawnMonster->SetPatrolPointLocation(mPatrolPointLocationArray);
@@ -98,8 +93,7 @@ void AMonsterSpawnPoint::Tick(float DeltaTime)
 	// 생성할 몬스터 클래스가 있을 경우에만 진행한다.
 	if (IsValid(mSpawnClass))
 	{
-		// 배열에 저장된 몬스터의 수와 생성해야할 몬스터의 수가 같다면
-		// 모두 생성되었다는 것이다.
+		// 배열에 저장된 몬스터의 수와 생성해야할 몬스터의 수가 같다면 모두 생성되었다는 것이다.
 		if (mMonsterArray.Num() < mSpawnCount)
 		{
 			mTime += DeltaTime;
@@ -109,13 +103,8 @@ void AMonsterSpawnPoint::Tick(float DeltaTime)
 				mTime -= mSpawnTime;
 
 				FActorSpawnParameters	SpawnParam;
-				SpawnParam.SpawnCollisionHandlingOverride =
-					ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-				AMonster* SpawnMonster =
-					GetWorld()->SpawnActor<AMonster>(mSpawnClass,
-						GetActorLocation(), GetActorRotation(),
-						SpawnParam);
+				SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				AMonster* SpawnMonster = GetWorld()->SpawnActor<AMonster>(mSpawnClass, GetActorLocation(), GetActorRotation(), SpawnParam);
 
 				SpawnMonster->SetSpawnPoint(this);
 				SpawnMonster->SetPatrolPointLocation(mPatrolPointLocationArray);
@@ -140,7 +129,7 @@ void AMonsterSpawnPoint::ComputeSpline()
 	{
 		if (mDivideCount != mPrevDivideCount)
 		{
-			int32	ComCount = mMeshArray.Num();
+			int32 ComCount = mMeshArray.Num();
 
 			for (int32 i = 0; i < ComCount; ++i)
 			{
@@ -155,7 +144,7 @@ void AMonsterSpawnPoint::ComputeSpline()
 
 	else
 	{
-		int32	ComCount = mMeshArray.Num();
+		int32 ComCount = mMeshArray.Num();
 
 		for (int32 i = 0; i < ComCount; ++i)
 		{
@@ -177,17 +166,12 @@ void AMonsterSpawnPoint::ComputeSpline()
 
 	for (int32 i = 0; i <= mDivideCount; ++i)
 	{
-		FVector	Point = mPatrolSpline->GetLocationAtDistanceAlongSpline(
-			mCellDistance * i, ESplineCoordinateSpace::World);
-
+		FVector	Point = mPatrolSpline->GetLocationAtDistanceAlongSpline(mCellDistance * i, ESplineCoordinateSpace::World);
 		mSplinePoint.Add(Point);
 
 		// 얻어온 월드위치를 로컬 위치로 변경도 가능하다.
 		FVector	LocalPoint = ActorTr.InverseTransformPosition(Point);
-
-		FRotator	Rot = mPatrolSpline->GetRotationAtDistanceAlongSpline(
-			mCellDistance * i, ESplineCoordinateSpace::World);
-
+		FRotator Rot = mPatrolSpline->GetRotationAtDistanceAlongSpline(mCellDistance * i, ESplineCoordinateSpace::World);
 		mSplineRotation.Add(Rot);
 
 		if (mDivideMeshVisible)
@@ -203,11 +187,8 @@ void AMonsterSpawnPoint::ComputeSpline()
 				MeshTr.SetScale3D(FVector(0.1f, 0.1f, 0.1f));
 				
 				MeshCom->SetRelativeTransform(MeshTr);
-
 				MeshCom->SetWorldRotation(Rot);
-
 				MeshCom->SetStaticMesh(mDivideMesh);
-
 				MeshCom->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 				mMeshArray.Add(MeshCom);

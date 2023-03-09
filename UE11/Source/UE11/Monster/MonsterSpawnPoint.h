@@ -20,8 +20,7 @@ protected:
 	USceneComponent* mRoot;
 
 	// TSubclassOf 는 템플릿으로 들어가는 타입의 UCLASS 정보를 저장하는 타입이다.
-	// Calss 정보를 저장해두었다고 필요시 해당 클래스 정보를 이용하여 객체를 생성
-	// 할 수 있는 용도로 사용할 수 있다.
+	// class 정보를 저장해두었다가 필요시 해당 클래스 정보를 이용하여 객체를 생성할 수 있는 용도로 사용할 수 있다.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TSubclassOf<class AMonster>		mSpawnClass;
 
@@ -66,14 +65,14 @@ protected:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	TArray<class AMonsterPatrolPoint*>	mPatrolPointArray;
+	TArray<class AMonsterPatrolPoint*>	mPatrolPointArray;	// 데이터에서 찍기 위해 만든 것
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EPatrolEndDir	mPatrolDir;
 
-	TArray<FVector>		mPatrolPointLocationArray;
+	TArray<FVector>		mPatrolPointLocationArray;	// 실제 위치 정보
 
-	float	mTime;
+	float	mTime;	// 시간 체크용
 
 public:
 	float GetSplineLength()	const

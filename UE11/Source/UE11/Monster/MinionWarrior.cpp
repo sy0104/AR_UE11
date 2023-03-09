@@ -44,8 +44,7 @@ void AMinionWarrior::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// 다른 BehaviorTree나 BlackboardData를 사용하면 여기에서
-	// 다르게 지정해준다.
+	// 다른 BehaviorTree나 BlackboardData를 사용하면 여기에서 다르게 지정해준다.
 }
 
 void AMinionWarrior::UnPossessed()
@@ -63,8 +62,7 @@ void AMinionWarrior::Attack()
 	{
 		FActorSpawnParameters	SpawnParam;
 		//SpawnParam.Template = mHitActor;
-		SpawnParam.SpawnCollisionHandlingOverride =
-			ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		// 타겟과 몬스터 사이에 이펙트를 재생한다.
 		FVector	Dir = GetActorLocation() - Target->GetActorLocation();
@@ -73,16 +71,11 @@ void AMinionWarrior::Attack()
 		FVector	ParticleLoc = Target->GetActorLocation() + Dir * 50.f;
 
 		AParticleCascade* Particle =
-			GetWorld()->SpawnActor<AParticleCascade>(
-				ParticleLoc,
-				Dir.Rotation(),
-				SpawnParam);
+			GetWorld()->SpawnActor<AParticleCascade>(ParticleLoc, Dir.Rotation(), SpawnParam);
 
 		Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
 		Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
 
-		Target->TakeDamage(
-			(float)mInfo.AttackPoint,
-			FDamageEvent(), GetController(), this);
+		Target->TakeDamage((float)mInfo.AttackPoint, FDamageEvent(), GetController(), this);
 	}
 }

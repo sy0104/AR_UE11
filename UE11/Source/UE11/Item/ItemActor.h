@@ -17,10 +17,10 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UStaticMeshComponent* mMesh;
+	UStaticMeshComponent*	mMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UBoxComponent* mBox;
+	UBoxComponent*			mBox;
 
 protected:
 	// Called when the game starts or when spawned

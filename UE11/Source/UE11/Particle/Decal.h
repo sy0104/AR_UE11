@@ -48,6 +48,8 @@ public:
 		mDecal->SetRelativeRotation(Rot);
 	}
 
+	void SetDecalMaterial(const FString& Path);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

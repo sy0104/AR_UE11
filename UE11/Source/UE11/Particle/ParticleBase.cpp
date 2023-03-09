@@ -10,7 +10,6 @@ AParticleBase::AParticleBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	mAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
-
 	SetRootComponent(mAudio);
 }
 
@@ -18,20 +17,17 @@ AParticleBase::AParticleBase()
 void AParticleBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void AParticleBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AParticleBase::SetSound(const FString& Path, bool Play)
 {
-	USoundBase* Sound = LoadObject<USoundBase>(
-		nullptr, *Path);
+	USoundBase* Sound = LoadObject<USoundBase>(nullptr, *Path);
 
 	if (IsValid(Sound))
 	{

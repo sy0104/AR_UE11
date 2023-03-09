@@ -6,7 +6,6 @@
 AParticleCascade::AParticleCascade()
 {
 	mParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle"));
-
 	mParticle->SetupAttachment(mAudio);
 }
 
@@ -19,8 +18,8 @@ void AParticleCascade::BeginPlay()
 
 void AParticleCascade::SetParticle(const FString& Path)
 {
-	UParticleSystem* Particle = LoadObject<UParticleSystem>(
-		nullptr, *Path);
+	// 동기화 방식으로 로딩한다.
+	UParticleSystem* Particle = LoadObject<UParticleSystem>(nullptr, *Path);
 
 	if (IsValid(Particle))
 		mParticle->SetTemplate(Particle);

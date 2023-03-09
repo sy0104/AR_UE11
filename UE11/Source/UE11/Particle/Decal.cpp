@@ -17,8 +17,15 @@ ADecal::ADecal()
 	mDecal->SetupAttachment(mRoot);
 
 	mRoot->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
-
 	mRoot->bVisualizeComponent = true;
+}
+
+void ADecal::SetDecalMaterial(const FString& Path)
+{
+	UMaterialInterface* Mtrl = LoadObject<UMaterialInterface>(nullptr, *Path);
+
+	if (IsValid(Mtrl))
+		mDecal->SetDecalMaterial(Mtrl);
 }
 
 // Called when the game starts or when spawned

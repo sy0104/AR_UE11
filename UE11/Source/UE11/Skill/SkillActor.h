@@ -37,6 +37,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	USoundBase* mSound;
 
+	// 템플릿을 활용해서 원본 데칼을 미리 만들어놓고 원본 데칼을 복제한 것을 생성해준다.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	class ADecal* mDecal;
 
@@ -44,6 +45,7 @@ protected:
 	float	mDecalLifeSpan;
 
 public:
+	// 다이나믹 멀티캐스트 델리게이트랑만 쓸 수 있음. 블루프린트에서도 얘를 할당할 수 있도록 노출해주는 역할을 한다.
 	UPROPERTY(BlueprintAssignable)
 	FOnSkillEnd	mOnSkillEnd;
 

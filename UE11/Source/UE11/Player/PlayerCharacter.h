@@ -61,12 +61,12 @@ public:
 	void JumpKey();
 	void Skill1Key();
 	void WeaponDetach();
-
+	void MouseMove();
 
 public:
 	virtual void NormalAttackCheck();
 	virtual void Skill1();
 
-
+public:
 	virtual void UseSkill(int32 SkillNumber);
 };

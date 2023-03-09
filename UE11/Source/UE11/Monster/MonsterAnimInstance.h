@@ -32,10 +32,10 @@ protected:
 	EMonsterAnimType	mAnimType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	float	mHitAdditive;
+	float				mHitAdditive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UAnimMontage* mHitMontage;
+	UAnimMontage*		mHitMontage;
 
 public:
 	void ChangeAnim(EMonsterAnimType Anim)

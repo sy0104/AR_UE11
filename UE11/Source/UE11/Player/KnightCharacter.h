@@ -6,9 +6,6 @@
 #include "KnightCharacter.generated.h"
 
 
-
-
-
 UCLASS()
 class UE11_API AKnightCharacter : public APlayerCharacter
 {
@@ -30,6 +27,5 @@ public:
 
 public:
 	UFUNCTION()
-	void Skill1End(class ASkillActor* SkillActor,
-		const FHitResult& Hit);
+	void Skill1End(class ASkillActor* SkillActor, const FHitResult& Hit);
 };
