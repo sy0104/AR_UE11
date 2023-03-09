@@ -16,10 +16,10 @@ class UE11_API AMonsterAIController : public AAIController
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UBehaviorTree*		mAITree;
+	UBehaviorTree* mAITree;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UBlackboardData*	mAIBlackboard;
+	UBlackboardData* mAIBlackboard;
 	
 public:
 	AMonsterAIController();

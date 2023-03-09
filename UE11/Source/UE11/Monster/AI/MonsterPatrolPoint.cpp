@@ -10,7 +10,9 @@ AMonsterPatrolPoint::AMonsterPatrolPoint()
 	PrimaryActorTick.bCanEverTick = true;
 
 	mRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+
 	SetRootComponent(mRoot);
+
 	mRoot->bVisualizeComponent = true;
 }
 

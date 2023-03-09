@@ -17,17 +17,18 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	FMonsterInfo	mInfo;
+		FMonsterInfo	mInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	FName		mMonsterTableRowName;
+		FName		mMonsterTableRowName;
 
 	AActor* mHitActor;
 
 	EPatrolType	mPatrolType;
 
 	class UMonsterAnimInstance* mAnimInst;
-	class AMonsterSpawnPoint* mSpawnPoint;	// 자신이 태어난 스폰 포인트를 알고있도록 한다
+
+	class AMonsterSpawnPoint* mSpawnPoint;
 
 	bool		mAttackEnd;
 
@@ -78,8 +79,8 @@ public:
 		return mPatrolPointLocationArray.Num() >= 2;
 	}
 
-	FVector GetPatrolLocation()	const; // 현재 이동해야 하는 지점의 위치 변환
-	FVector GetPatrolPointLocation() const;	// 지점이 1개라면 patrol을 할 수 있다.
+	FVector GetPatrolLocation()	const;
+	FVector GetPatrolPointLocation()	const;
 
 	float GetPatrolWaitTime()	const
 	{

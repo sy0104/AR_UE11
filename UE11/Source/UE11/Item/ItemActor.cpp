@@ -13,6 +13,7 @@ AItemActor::AItemActor()
 	mMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 
 	SetRootComponent(mBox);
+
 	mMesh->SetupAttachment(mBox);
 }
 

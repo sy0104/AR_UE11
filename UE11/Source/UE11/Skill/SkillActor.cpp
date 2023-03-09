@@ -11,6 +11,7 @@ ASkillActor::ASkillActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	mRoot = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
+
 	SetRootComponent(mRoot);
 
 	mSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
@@ -37,7 +38,8 @@ void ASkillActor::BeginPlay()
 		UGameplayStatics::PlaySoundAtLocation(this, mSound, GetActorLocation());
 }
 
-void ASkillActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ASkillActor::EndPlay(
+	const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
@@ -53,7 +55,8 @@ void ASkillActor::Tick(float DeltaTime)
 
 void ASkillActor::SetSkeletalMesh(const FString& Path)
 {
-	USkeletalMesh* SkeletalMesh = LoadObject<USkeletalMesh>(nullptr, *Path);
+	USkeletalMesh* SkeletalMesh = LoadObject<USkeletalMesh>(
+		nullptr, *Path);
 
 	if (IsValid(SkeletalMesh))
 		mSkeletalMesh->SetSkeletalMesh(SkeletalMesh);
@@ -61,7 +64,8 @@ void ASkillActor::SetSkeletalMesh(const FString& Path)
 
 void ASkillActor::SetStaticMesh(const FString& Path)
 {
-	UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(nullptr, *Path);
+	UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(
+		nullptr, *Path);
 
 	if (IsValid(StaticMesh))
 		mStaticMesh->SetStaticMesh(StaticMesh);
@@ -69,7 +73,8 @@ void ASkillActor::SetStaticMesh(const FString& Path)
 
 void ASkillActor::SetParticle(const FString& Path)
 {
-	UParticleSystem* Particle = LoadObject<UParticleSystem>(nullptr, *Path);
+	UParticleSystem* Particle = LoadObject<UParticleSystem>(
+		nullptr, *Path);
 
 	if (IsValid(Particle))
 		mParticle->SetTemplate(Particle);
@@ -97,18 +102,21 @@ void ASkillActor::SetDecalTemplate(ADecal* Decal)
 
 void ASkillActor::CreateDecal(const FHitResult& Hit)
 {
-	// mDecal이 있으면 데칼을 생성해준다.
 	if (!IsValid(mDecal))
 		return;
 
-	FActorSpawnParameters SpawnParam;
+	FActorSpawnParameters	SpawnParam;
 	SpawnParam.Template = mDecal;
-	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParam.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ADecal* Decal = GetWorld()->SpawnActor<ADecal>(
-		GetActorLocation() + GetActorForwardVector() * 100.f, GetActorRotation(), SpawnParam);
+	ADecal* Decal =
+		GetWorld()->SpawnActor<ADecal>(
+			GetActorLocation(),
+			GetActorRotation(),
+			SpawnParam);
 
-	//PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("LifeSpan : %.5f"), mDecalLifeSpan));
+	PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("LifeSpan : %.5f"), mDecalLifeSpan));
 	Decal->SetLifeSpan(mDecalLifeSpan);
 
 	switch (mDecal->GetSpawnType())
@@ -119,14 +127,20 @@ void ASkillActor::CreateDecal(const FHitResult& Hit)
 		break;
 	case EDecalSpawnType::Floor:
 	{
-		FCollisionQueryParams param(NAME_None, false, this);
-		FHitResult LineHit;
+		FCollisionQueryParams	param(NAME_None, false, this);
 
-		bool Collision = GetWorld()->LineTraceSingleByChannel(LineHit, GetActorLocation(),
-			GetActorLocation() + FVector::DownVector * 1000.f, ECollisionChannel::ECC_Visibility, param);
+		FHitResult	LineHit;
+		bool Collision = GetWorld()->LineTraceSingleByChannel(
+			LineHit,
+			GetActorLocation(),
+			GetActorLocation() + FVector::DownVector * 1000.f,
+			ECollisionChannel::ECC_Visibility,
+			param);
 
 		if (Collision)
+		{
 			Decal->SetActorLocation(LineHit.ImpactPoint);
+		}
 	}
 		break;
 	}

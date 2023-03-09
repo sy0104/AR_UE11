@@ -9,14 +9,15 @@ UBTDecorator_CheckDistance::UBTDecorator_CheckDistance()
 {
 }
 
-bool UBTDecorator_CheckDistance::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
+bool UBTDecorator_CheckDistance::CalculateRawConditionValue(
+	UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
-	//PrintViewport(2.f, FColor::Red, FString::Printf(TEXT("this : %d"), (int64)this));
-
-	// GetAIOwner() : UBehaviorTreeComponent를 가지고 있는 AIController를 얻어올 수 있다.
-	AMonsterAIController* Controller = Cast<AMonsterAIController>(OwnerComp.GetAIOwner());
+	// GetAIOwner() : UBehaviorTreeComponent를 가지고 있는
+	// AIController를 얻어올 수 있다.
+	AMonsterAIController* Controller =
+		Cast<AMonsterAIController>(OwnerComp.GetAIOwner());
 
 	if (!IsValid(Controller))
 		return false;
@@ -32,24 +33,25 @@ bool UBTDecorator_CheckDistance::CalculateRawConditionValue(UBehaviorTreeCompone
 	if (!IsValid(Target))
 		return false;
 
-	// 몬스터의 AttackDistance, TraceDistance를 가져와야 함.
 	const FMonsterInfo& Info = Monster->GetMonsterInfo();
 
 	// 몬스터의 위치와 타겟의 위치를 이용하여 거리를 구한다.
 	FVector	MonsterLoc = Monster->GetActorLocation();
 	FVector	TargetLoc = Target->GetActorLocation();
 
-	MonsterLoc = MonsterLoc - FVector(0.f, 0.f, Monster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	TargetLoc = TargetLoc - FVector(0.f, 0.f, Target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	MonsterLoc = MonsterLoc -
+		FVector(0.f, 0.f, Monster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	TargetLoc = TargetLoc -
+		FVector(0.f, 0.f, Target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 
 	// 두 위치 사이의 거리를 구해준다.
-	float Distance = FVector::Distance(MonsterLoc, TargetLoc);
+	float	Distance = FVector::Distance(MonsterLoc, TargetLoc);
 
 	// 두 위치 사이의 거리에서 Capsule의 반경을 뺀다.
 	Distance -= Monster->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	Distance -= Target->GetCapsuleComponent()->GetScaledCapsuleRadius();
 
-	float Check = 0.f;
+	float	Check = 0.f;
 
 	switch (mCheckType)
 	{

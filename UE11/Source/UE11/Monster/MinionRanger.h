@@ -17,7 +17,7 @@ public:
 	AMinionRanger();
 
 protected:
-	AActor*		mMuzzleParticle;
+	AActor* mMuzzleParticle;
 
 protected:
 	// Called when the game starts or when spawned

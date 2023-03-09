@@ -20,7 +20,7 @@ AMonster::AMonster()
 	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
 	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;	// 스폰시에도 AI 컨트롤러가 빙의되도록
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = AMonsterAIController::StaticClass();
 
 	mAttackEnd = false;
@@ -64,8 +64,11 @@ void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UUE11GameInstance* GameInst = GetWorld()->GetGameInstance<UUE11GameInstance>();
-	const FMonsterTableInfo* Info = GameInst->FindMonsterTable(mMonsterTableRowName);
+	UUE11GameInstance* GameInst = 
+		GetWorld()->GetGameInstance<UUE11GameInstance>();
+
+	const FMonsterTableInfo* Info = 
+		GameInst->FindMonsterTable(mMonsterTableRowName);
 
 	if (Info)
 	{
@@ -89,6 +92,7 @@ void AMonster::BeginPlay()
 		GetCharacterMovement()->MaxWalkSpeedCrouched = mInfo.MoveSpeed * 0.5f;
 
 		GetMesh()->SetSkeletalMesh(Info->Mesh);
+
 		GetMesh()->SetAnimInstanceClass(Info->MonsterAnimClass);
 	}
 	
@@ -103,17 +107,22 @@ void AMonster::Tick(float DeltaTime)
 	// 현재 패트롤 상태일 경우 속도벡터를 이용하여 이동양을 구한다.
 	if (mPatrolEnable)
 	{
-		// 현재 도착지점의 인덱스를 이용해서 그 값을 넘어갈 경우 해당 값으로 고정하여 거기까지만 이동할 수 있도록 한다.
-		mPatrolCurrentDistance += (GetCharacterMovement()->MaxWalkSpeed * DeltaTime * mPatrolIndexAdd);
+		// 현재 도착지점의 인덱스를 이용해서 그 값을 넘어갈 경우 해당 값으로
+		// 고정하여 거기까지만 이동할 수 있도록 한다.
+		mPatrolCurrentDistance += (GetCharacterMovement()->MaxWalkSpeed *
+			DeltaTime * mPatrolIndexAdd);
 
 		if (GetArrive())
 		{
 			if (mPatrolIndexAdd == 1)
+			{
 				mPatrolCurrentDistance = mPatrolIndex * mPatrolCellDistance;
+			}
 
 			else
+			{
 				mPatrolCurrentDistance = mPatrolIndex * mPatrolCellDistance;
-
+			}
 			mPatrolEnable = false;
 		}
 	}
@@ -126,11 +135,15 @@ void AMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float AMonster::TakeDamage(float DamageAmount, 
+	FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
 {
-	int32 Damage = (int32)Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	int32 Damage = (int32)Super::TakeDamage(DamageAmount, DamageEvent,
+		EventInstigator, DamageCauser);
 
 	Damage = Damage - mInfo.ArmorPoint;
+
 	Damage = Damage < 1 ? 1 : Damage;
 
 	mInfo.HP -= Damage;
@@ -142,7 +155,6 @@ float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 		// 죽었다.
 		mAnimInst->ChangeAnim(EMonsterAnimType::Death);
 
-		// 몬스터가 죽었으면 AIController의 동작도 멈춰준다.
 		AAIController* AI = Cast<AAIController>(GetController());
 
 		if (IsValid(AI))
@@ -163,8 +175,10 @@ void AMonster::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와 Blackboard를 지정해준다.
-	AMonsterAIController* AI = Cast<AMonsterAIController>(NewController);
+	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와
+	// Blackboard를 지정해준다.
+	AMonsterAIController* AI =
+		Cast<AMonsterAIController>(NewController);
 
 	if (IsValid(AI))
 	{
