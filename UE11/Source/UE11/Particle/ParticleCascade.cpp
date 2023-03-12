@@ -17,6 +17,12 @@ void AParticleCascade::BeginPlay()
 	mParticle->OnSystemFinished.AddDynamic(this, &AParticleCascade::ParticleFinish);
 }
 
+void AParticleCascade::SetParticle(UParticleSystem* Particle)
+{
+	if (IsValid(Particle))
+		mParticle->SetTemplate(Particle);
+}
+
 void AParticleCascade::SetParticle(const FString& Path)
 {
 	UParticleSystem* Particle = LoadObject<UParticleSystem>(

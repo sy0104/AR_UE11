@@ -31,6 +31,15 @@ AMonster::AMonster()
 
 	mPatrolEnable = false;
 	mPatrolCurrentDistance = 0.f;
+
+	mDissolveEnable = false;
+	mDissolveMax = 1.5f;
+	mDissolveMin = -1.f;
+	mDissolveTimeMax = 3.f;
+	mDissolveTime = 0.f;
+
+	mDissolve = 0.f;
+	mDissolveRange = mDissolveMax - mDissolveMin;
 }
 
 FVector AMonster::GetPatrolLocation() const
@@ -57,6 +66,21 @@ FVector AMonster::GetPatrolPointLocation() const
 	}
 
 	return FVector::ZeroVector;
+}
+
+void AMonster::OnDissolve()
+{
+	if (mDissolveMtrlArray.IsEmpty())
+		return;
+
+	mDissolveEnable = true;
+
+	int32	Count = mDissolveMtrlArray.Num();
+
+	for (int32 i = 0; i < Count; ++i)
+	{
+		mDissolveMtrlArray[i]->SetScalarParameterValue(TEXT("DissolveEnable"), 1.f);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -94,9 +118,22 @@ void AMonster::BeginPlay()
 		GetMesh()->SetSkeletalMesh(Info->Mesh);
 
 		GetMesh()->SetAnimInstanceClass(Info->MonsterAnimClass);
+
+		int32	IndexCount = mDissolveMtrlIndexArray.Num();
+
+		for (int32 i = 0; i < IndexCount; ++i)
+		{
+			UMaterialInstanceDynamic* Mtrl = 
+				GetMesh()->CreateDynamicMaterialInstance(mDissolveMtrlIndexArray[i].Index,
+					mDissolveMtrlIndexArray[i].Mtrl);
+
+			mDissolveMtrlArray.Add(Mtrl);
+		}
 	}
 	
 	mAnimInst = Cast<UMonsterAnimInstance>(GetMesh()->GetAnimInstance());
+
+
 }
 
 // Called every frame
@@ -124,6 +161,30 @@ void AMonster::Tick(float DeltaTime)
 				mPatrolCurrentDistance = mPatrolIndex * mPatrolCellDistance;
 			}
 			mPatrolEnable = false;
+		}
+	}
+
+	if (mDissolveEnable)
+	{
+		mDissolveTime += DeltaTime;
+
+		// 총 시간에서의 비율을 구한다.
+		float	Ratio = mDissolveTime / mDissolveTimeMax;
+
+		// 비율을 이용하여 Dissolve값의 전체 범위에 곱해서 얼마나 진행되었는지를 구한다.
+		mDissolve = mDissolveMax - Ratio * mDissolveRange;
+
+		int32	Count = mDissolveMtrlArray.Num();
+
+		for (int32 i = 0; i < Count; ++i)
+		{
+			mDissolveMtrlArray[i]->SetScalarParameterValue(TEXT("Dissolve"), mDissolve);
+		}
+
+		if (mDissolveTime >= mDissolveTimeMax)
+		{
+			mSpawnPoint->RemoveMonster(this);
+			Destroy();
 		}
 	}
 }
@@ -160,7 +221,7 @@ float AMonster::TakeDamage(float DamageAmount,
 		if (IsValid(AI))
 			AI->BrainComponent->StopLogic(TEXT("Death"));
 
-		mSpawnPoint->RemoveMonster(this);
+		//mSpawnPoint->RemoveMonster(this);
 	}
 
 	else

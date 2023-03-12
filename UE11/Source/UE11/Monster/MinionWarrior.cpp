@@ -33,6 +33,11 @@ AMinionWarrior::AMinionWarrior()
 	AParticleCascade* Particle = Cast<AParticleCascade>(mHitActor);
 	Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
 	Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"), false);
+
+	FConvertMaterial	Mtrl;
+	Mtrl.Index = 0;
+
+	mDissolveMtrlIndexArray.Add(Mtrl);
 }
 
 void AMinionWarrior::BeginPlay()

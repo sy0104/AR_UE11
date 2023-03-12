@@ -118,4 +118,10 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_UseSkill();
+
+	UFUNCTION()
+	void AnimNotify_FootLeft();
+
+	UFUNCTION()
+	void AnimNotify_FootRight();
 };

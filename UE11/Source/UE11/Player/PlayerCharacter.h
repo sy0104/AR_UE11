@@ -62,12 +62,16 @@ public:
 	void Skill1Key();
 	void WeaponDetach();
 	void MouseMove();
+	void Skill2Key();
 
 
 public:
 	virtual void NormalAttackCheck();
 	virtual void Skill1();
+	virtual void Skill2();
 
 
 	virtual void UseSkill(int32 SkillNumber);
+
+	void FootStep(bool Left);
 };

@@ -25,6 +25,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	virtual void SetParticle(UParticleSystem* Particle);
 	virtual void SetParticle(const FString& Path);
 
 public:

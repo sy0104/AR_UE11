@@ -161,3 +161,20 @@ void UPlayerAnimInstance::AnimNotify_UseSkill()
 	if (IsValid(PlayerCharacter))
 		PlayerCharacter->UseSkill(mUseSkillNumber);
 }
+
+void UPlayerAnimInstance::AnimNotify_FootLeft()
+{
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	if (IsValid(PlayerCharacter))
+		PlayerCharacter->FootStep(true);
+}
+
+void UPlayerAnimInstance::AnimNotify_FootRight()
+{
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	if (IsValid(PlayerCharacter))
+		PlayerCharacter->FootStep(false);
+}
+

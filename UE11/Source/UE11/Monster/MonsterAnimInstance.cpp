@@ -22,7 +22,10 @@ void UMonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UMonsterAnimInstance::AnimNotify_DeathEnd()
 {
-	TryGetPawnOwner()->Destroy();
+	AMonster* Monster = Cast<AMonster>(TryGetPawnOwner());
+
+	if (IsValid(Monster))
+		Monster->OnDissolve();
 }
 
 void UMonsterAnimInstance::AnimNotify_HitEnd()

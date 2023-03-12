@@ -29,5 +29,7 @@ public:
 
 public:
 	void SetSound(const FString& Path, bool Play = true);
+	void SetSound(USoundBase* Sound, bool Play = true);
+	virtual void SetParticle(UParticleSystem* Particle);
 	virtual void SetParticle(const FString& Path);
 };

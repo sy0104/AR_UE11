@@ -28,6 +28,11 @@ AMinionRanger::AMinionRanger()
 	Particle = Cast<AParticleCascade>(mHitActor);
 	Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonMinions/FX/Particles/Minions/Shared/P_MinionMuzzle.P_MinionMuzzle'"));
 	Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"), false);
+
+	FConvertMaterial	Mtrl;
+	Mtrl.Index = 0;
+
+	mDissolveMtrlIndexArray.Add(Mtrl);
 }
 
 void AMinionRanger::BeginPlay()

@@ -7,6 +7,8 @@
 #include "../Skill/SkillProjectile.h"
 #include "../Item/WeaponActor.h"
 #include "UE11PlayerController.h"
+#include "../Material/UE11PhysicalMaterial.h"
+#include "../Particle/ParticleCascade.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -108,6 +110,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		TEXT("MouseMove"),
 		EInputEvent::IE_Pressed, this,
 		&APlayerCharacter::MouseMove);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("Skill2"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::Skill2Key);
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, 
@@ -290,6 +297,11 @@ void APlayerCharacter::MouseMove()
 	}
 }
 
+void APlayerCharacter::Skill2Key()
+{
+	Skill2();
+}
+
 void APlayerCharacter::NormalAttackCheck()
 {
 }
@@ -298,6 +310,65 @@ void APlayerCharacter::Skill1()
 {
 }
 
+void APlayerCharacter::Skill2()
+{
+}
+
 void APlayerCharacter::UseSkill(int32 SkillNumber)
 {
+}
+
+void APlayerCharacter::FootStep(bool Left)
+{
+	FVector	LineStart;
+
+	if (Left)
+		LineStart = GetMesh()->GetSocketLocation(TEXT("Foot_L"));
+
+	else
+		LineStart = GetMesh()->GetSocketLocation(TEXT("Foot_R"));
+
+	FVector	LineEnd = LineStart + FVector::DownVector * 50.f;
+
+	FCollisionQueryParams	param(NAME_None, false, this);
+
+	// 충돌 결과로 물리적인 재질 여부를 가지고 올지를 결정한다.
+	param.bReturnPhysicalMaterial = true;
+
+	FHitResult	result;
+	bool Hit = GetWorld()->LineTraceSingleByChannel(result,
+		LineStart, LineEnd, ECollisionChannel::ECC_GameTraceChannel9,
+		param);
+
+	if (Hit)
+	{
+		UUE11PhysicalMaterial* Phys = Cast<UUE11PhysicalMaterial>(result.PhysMaterial);
+
+		if (IsValid(Phys))
+		{
+			//PrintViewport(1.f, FColor::Blue, TEXT("Phys"));
+			//Phys->Play(result.ImpactPoint, result.ImpactNormal);
+			if (IsValid(Phys->GetParticle()))
+			{
+				FActorSpawnParameters	SpawnParam;
+
+				SpawnParam.SpawnCollisionHandlingOverride =
+					ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				AParticleCascade* Particle =
+					GetWorld()->SpawnActor<AParticleCascade>(
+						result.ImpactPoint, 
+						result.ImpactNormal.Rotation(), SpawnParam);
+
+				Particle->SetParticle(Phys->GetParticle());
+				Particle->SetSound(Phys->GetSound());
+			}
+
+			else if (IsValid(Phys->GetSound()))
+			{
+				PrintViewport(1.f, FColor::Blue, TEXT("Sound"));
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Phys->GetSound(), result.ImpactPoint);
+			}
+		}
+	}
 }

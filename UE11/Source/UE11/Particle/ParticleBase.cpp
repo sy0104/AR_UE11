@@ -42,6 +42,21 @@ void AParticleBase::SetSound(const FString& Path, bool Play)
 	}
 }
 
+void AParticleBase::SetSound(USoundBase* Sound, bool Play)
+{
+	if (IsValid(Sound))
+	{
+		mAudio->SetSound(Sound);
+
+		if (Play)
+			mAudio->Play();
+	}
+}
+
+void AParticleBase::SetParticle(UParticleSystem* Particle)
+{
+}
+
 void AParticleBase::SetParticle(const FString& Path)
 {
 }

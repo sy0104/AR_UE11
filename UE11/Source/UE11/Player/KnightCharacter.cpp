@@ -8,6 +8,7 @@
 #include "../Skill/SkillProjectile.h"
 #include "../Particle/Decal.h"
 #include "../Item/WeaponActor.h"
+#include "../Skill/Ghost.h"
 
 AKnightCharacter::AKnightCharacter()
 {
@@ -36,6 +37,7 @@ AKnightCharacter::AKnightCharacter()
 		// FObjectFinder 객체의 Object 변수에 로딩한 애셋이
 		// 들어가 있다.
 		GetMesh()->SetSkeletalMesh(KnightAsset.Object);
+		mGhostMesh = KnightAsset.Object;
 	}
 
 	GetMesh()->SetRelativeLocation(FVector(0.0, 0.0, -88.0));
@@ -55,6 +57,13 @@ AKnightCharacter::AKnightCharacter()
 	AParticleCascade* Particle = Cast<AParticleCascade>(mHitActor);
 	Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
 	Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"), false);
+
+	mGhostEnable = false;
+	mGhostTime = 0.f;
+	mGhostTimeMax = 5.f;
+
+	mGhostCreateTime = 0.f;
+	mGhostCreateTimeMax = 0.2f;
 }
 
 void AKnightCharacter::BeginPlay()
@@ -91,10 +100,7 @@ void AKnightCharacter::BeginPlay()
 	SkillProjectile->SetSound(TEXT("SoundWave'/Game/Sound/Fire4.Fire4'"));
 	SkillProjectile->SetCollisionProfile(TEXT("PlayerAttack"));
 
-	//SkillProjectile->AddSkillEndDelegate<AKnightCharacter>(this,
-	//	&AKnightCharacter::Skill1End);
-	SkillProjectile->mOnSkillEnd.AddDynamic(this,
-		&AKnightCharacter::Skill1End);
+	SkillProjectile->mOnSkillEnd.AddDynamic(this, &AKnightCharacter::Skill1End);
 
 	UProjectileMovementComponent* Projectile = SkillProjectile->GetProjectile();
 
@@ -113,27 +119,55 @@ void AKnightCharacter::BeginPlay()
 	mSkillInfoArray.Add(SkillInfo);
 
 	FActorSpawnParameters	SpawnParam;
-	SpawnParam.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	mWeapon = GetWorld()->SpawnActor<AWeaponActor>(
-		AWeaponActor::StaticClass(), SpawnParam);
-
+	mWeapon = GetWorld()->SpawnActor<AWeaponActor>(AWeaponActor::StaticClass(), SpawnParam);
 	mWeapon->SetMesh(TEXT("StaticMesh'/Game/Meshes/Axe1.Axe1'"));
+	mWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("weapon_l_socket"));
+}
 
-	mWeapon->AttachToComponent(GetMesh(),
-		FAttachmentTransformRules::KeepRelativeTransform,
-		TEXT("weapon_l_socket"));
+void AKnightCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (mGhostEnable)
+	{
+		mGhostTime += DeltaTime;
+		mGhostCreateTime += DeltaTime;
+
+		if (mGhostCreateTime >= mGhostCreateTimeMax)
+		{
+			mGhostCreateTime -= mGhostCreateTimeMax;
+
+			// 잔상 생성
+			FActorSpawnParameters	SpawnParam;
+			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			AGhost* Ghost =
+				GetWorld()->SpawnActor<AGhost>(
+					GetMesh()->GetComponentLocation(),
+					GetMesh()->GetComponentRotation(),
+					SpawnParam);
+
+			Ghost->SetGhostType(EGhostType::Fade);
+			Ghost->SetMesh(mGhostMesh);
+			Ghost->CopyAnimation(GetMesh());	// 현재 플레이어 포즈를 복사해서 세팅해준다.
+		}
+
+		if (mGhostTime >= mGhostTimeMax)
+		{
+			mGhostTime = 0.f;
+			mGhostEnable = false;
+		}
+	}
 }
 
 void AKnightCharacter::NormalAttackCheck()
 {
 	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
 
-	FVector	StartLocation = GetActorLocation() +
-		GetActorForwardVector() * 30.f;
-	FVector	EndLocation = StartLocation +
-		GetActorForwardVector() * State->GetInfo().AttackDistance;
+	FVector	StartLocation = GetActorLocation() + GetActorForwardVector() * 30.f;
+	FVector	EndLocation = StartLocation + GetActorForwardVector() * State->GetInfo().AttackDistance;
 
 	FCollisionQueryParams	param(NAME_None, false, this);
 
@@ -237,6 +271,13 @@ void AKnightCharacter::Skill1()
 		return;
 
 	mAnimInst->UseSkill(SkillNumber);
+}
+
+void AKnightCharacter::Skill2()
+{
+	mGhostEnable = true;
+	mGhostTime = 0.f;
+	mGhostCreateTime = 0.f;
 }
 
 void AKnightCharacter::UseSkill(int32 SkillNumber)

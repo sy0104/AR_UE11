@@ -6,6 +6,18 @@
 #include "GameFramework/Character.h"
 #include "Monster.generated.h"
 
+struct FConvertMaterial
+{
+	int32	Index;
+	UMaterialInstanceDynamic* Mtrl;
+
+	FConvertMaterial()	:
+		Index(-1),
+		Mtrl(nullptr)
+	{
+	}
+};
+
 UCLASS()
 class UE11_API AMonster : public ACharacter
 {
@@ -45,8 +57,27 @@ protected:
 	float				mPatrolCellDistance;
 	float				mPatrolCurrentDistance;
 
+	TArray<UMaterialInstanceDynamic*>	mDissolveMtrlArray;
+
+	// Dissolve를 적용하고자 하는 Material Slot의 인덱스를 넣어준다.
+	TArray<FConvertMaterial>	mDissolveMtrlIndexArray;
+
 	float				mPatrolTime;
 	float				mPatrolTimeAcc;
+
+	bool				mDissolveEnable;
+	float				mDissolve;
+	float				mDissolveRange;
+	float				mDissolveTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float				mDissolveTimeMax;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float				mDissolveMin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float				mDissolveMax;
 
 public:
 	bool GetArrive()	const
@@ -213,6 +244,8 @@ public:
 	{
 		mSpawnPoint = SpawnPoint;
 	}
+
+	void OnDissolve();
 
 protected:
 	// Called when the game starts or when spawned
