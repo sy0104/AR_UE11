@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <Blueprint\UserWidget.h>
+
 #include "GameInfo.h"
 #include "GameFramework/GameModeBase.h"
 #include "UE11GameModeBase.generated.h"
@@ -22,4 +24,8 @@ public:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
 	virtual void PostLogin(APlayerController* NewPlayer);
 	virtual void Tick(float DeltaTime)	override;
+
+private:
+	TSubclassOf<UUserWidget>	mMainHUDClass;
+	UUserWidget*				mMainHUD;
 };

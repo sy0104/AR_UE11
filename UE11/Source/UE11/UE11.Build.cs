@@ -10,7 +10,7 @@ public class UE11 : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { 
 			"Core", "CoreUObject", "Engine", "InputCore",
-			"AIModule", "GameplayTasks", "NavigationSystem" });
+			"AIModule", "GameplayTasks", "NavigationSystem", "UMG" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

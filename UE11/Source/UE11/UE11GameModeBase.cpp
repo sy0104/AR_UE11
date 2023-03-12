@@ -27,13 +27,27 @@ AUE11GameModeBase::AUE11GameModeBase()
 	DefaultPawnClass = AKnightCharacter::StaticClass();
 	PlayerControllerClass = AUE11PlayerController::StaticClass();
 	PlayerStateClass = AUE11PlayerState::StaticClass();
+
+	// UI_MainHUD 블루프린트 클래스의 UClass 정보를 가져온다.
+	ConstructorHelpers::FClassFinder<UUserWidget>
+		finder(TEXT("WidgetBlueprint'/Game/Blueprints/UIClass/UMG/UI_MainHUD.UI_MainHUD_C'"));
+
+	if (finder.Succeeded())
+		mMainHUDClass = finder.Class;
 }
 
-// 아래 함수들은 InitGame -> PostLogin -> BeginPlay 함수 순서로
-// 호출이 된다.
+// 아래 함수들은 InitGame -> PostLogin -> BeginPlay 함수 순서로 호출이 된다.
 void AUE11GameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 위젯 블루프린트 UClass 정보를 이용해서 객체를 만들어낸다.
+	if (IsValid(mMainHUDClass))
+	{
+		// 생성한 객체의 주소를 mMainHUD에 받아둔다.
+		mMainHUD = CreateWidget(GetWorld(), mMainHUDClass);
+		mMainHUD->AddToViewport();
+	}
 }
 
 void AUE11GameModeBase::InitGame(const FString& MapName, 
