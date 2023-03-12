@@ -9,8 +9,8 @@
 
 enum class EGhostType : uint8
 {
-	Time,	// 잔상이 일정 시간동안 지속되다가 바로 제거됨
-	Fade	// 잔상이 일정 시간동안 나와있다가 FadeOut 효과를 이용해서 투명도를 0으로 만들어 제거
+	Time,
+	Fade
 };
 
 UCLASS()
@@ -27,7 +27,7 @@ protected:
 	UPoseableMeshComponent* mMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UMaterialInterface* mGhostMaterial;		// Ghost가 원본 머티리얼을 들고 있도록 해준다.
+	UMaterialInterface* mGhostMaterial;
 
 	TArray<UMaterialInstanceDynamic*>	mMtrlArray;
 

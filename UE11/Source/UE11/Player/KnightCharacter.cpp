@@ -100,7 +100,10 @@ void AKnightCharacter::BeginPlay()
 	SkillProjectile->SetSound(TEXT("SoundWave'/Game/Sound/Fire4.Fire4'"));
 	SkillProjectile->SetCollisionProfile(TEXT("PlayerAttack"));
 
-	SkillProjectile->mOnSkillEnd.AddDynamic(this, &AKnightCharacter::Skill1End);
+	//SkillProjectile->AddSkillEndDelegate<AKnightCharacter>(this,
+	//	&AKnightCharacter::Skill1End);
+	SkillProjectile->mOnSkillEnd.AddDynamic(this,
+		&AKnightCharacter::Skill1End);
 
 	UProjectileMovementComponent* Projectile = SkillProjectile->GetProjectile();
 
@@ -119,11 +122,17 @@ void AKnightCharacter::BeginPlay()
 	mSkillInfoArray.Add(SkillInfo);
 
 	FActorSpawnParameters	SpawnParam;
-	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParam.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	mWeapon = GetWorld()->SpawnActor<AWeaponActor>(AWeaponActor::StaticClass(), SpawnParam);
+	mWeapon = GetWorld()->SpawnActor<AWeaponActor>(
+		AWeaponActor::StaticClass(), SpawnParam);
+
 	mWeapon->SetMesh(TEXT("StaticMesh'/Game/Meshes/Axe1.Axe1'"));
-	mWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("weapon_l_socket"));
+
+	mWeapon->AttachToComponent(GetMesh(),
+		FAttachmentTransformRules::KeepRelativeTransform,
+		TEXT("weapon_l_socket"));
 }
 
 void AKnightCharacter::Tick(float DeltaTime)
@@ -141,7 +150,9 @@ void AKnightCharacter::Tick(float DeltaTime)
 
 			// 잔상 생성
 			FActorSpawnParameters	SpawnParam;
-			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			//SpawnParam.Template = mHitActor;
+			SpawnParam.SpawnCollisionHandlingOverride =
+				ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 			AGhost* Ghost =
 				GetWorld()->SpawnActor<AGhost>(
@@ -151,7 +162,7 @@ void AKnightCharacter::Tick(float DeltaTime)
 
 			Ghost->SetGhostType(EGhostType::Fade);
 			Ghost->SetMesh(mGhostMesh);
-			Ghost->CopyAnimation(GetMesh());	// 현재 플레이어 포즈를 복사해서 세팅해준다.
+			Ghost->CopyAnimation(GetMesh());
 		}
 
 		if (mGhostTime >= mGhostTimeMax)
@@ -166,8 +177,10 @@ void AKnightCharacter::NormalAttackCheck()
 {
 	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
 
-	FVector	StartLocation = GetActorLocation() + GetActorForwardVector() * 30.f;
-	FVector	EndLocation = StartLocation + GetActorForwardVector() * State->GetInfo().AttackDistance;
+	FVector	StartLocation = GetActorLocation() +
+		GetActorForwardVector() * 30.f;
+	FVector	EndLocation = StartLocation +
+		GetActorForwardVector() * State->GetInfo().AttackDistance;
 
 	FCollisionQueryParams	param(NAME_None, false, this);
 

@@ -8,7 +8,8 @@ UUE11PhysicalMaterial::UUE11PhysicalMaterial()
 {
 }
 
-void UUE11PhysicalMaterial::Play(const FVector& Loc, const FVector& Dir)
+void UUE11PhysicalMaterial::Play(const FVector& Loc, 
+	const FVector& Dir)
 {
 	/*if (IsValid(mParticle))
 	{

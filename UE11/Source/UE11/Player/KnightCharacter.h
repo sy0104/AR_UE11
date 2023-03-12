@@ -43,5 +43,6 @@ public:
 
 public:
 	UFUNCTION()
-	void Skill1End(class ASkillActor* SkillActor, const FHitResult& Hit);
+	void Skill1End(class ASkillActor* SkillActor,
+		const FHitResult& Hit);
 };

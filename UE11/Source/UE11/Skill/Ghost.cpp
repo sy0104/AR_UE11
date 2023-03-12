@@ -10,6 +10,7 @@ AGhost::AGhost()
 	PrimaryActorTick.bCanEverTick = true;
 
 	mMesh = CreateDefaultSubobject<UPoseableMeshComponent>(TEXT("Mesh"));
+
 	SetRootComponent(mMesh);
 
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface>	Mtrl(TEXT("MaterialInstanceConstant'/Game/Materials/MTGhost_Inst.MTGhost_Inst'"));
@@ -80,9 +81,6 @@ void AGhost::SetMesh(USkeletalMesh* Mesh)
 
 	if (mGhostMaterial)
 	{
-		// GetNumMaterials()
-		// 이 메쉬 컴포넌트가 사용하고 있는 머티리얼의 개수를 반환해준다.
-		// 그 머티리얼 개수를 받아와서 전부 다이나믹 머티리얼 인스턴스로 만들어준다.
 		int32	Count = mMesh->GetNumMaterials();
 
 		for (int32 i = 0; i < Count; ++i)
@@ -97,13 +95,13 @@ void AGhost::SetMesh(USkeletalMesh* Mesh)
 
 void AGhost::CopyAnimation(USkeletalMeshComponent* Com)
 {
-	// 플레이어 모션 도중 내가 원하는 일정 순간마다 복제한 스켈레탈을 만들고 그것으로 잔상을 만든다.
 	mMesh->CopyPoseFromSkeletalComponent(Com);
 }
 
 void AGhost::SetGhostMaterial(const FString& Path)
 {
-	UMaterialInterface* Material = LoadObject<UMaterialInterface>(GetWorld(), *Path);
+	UMaterialInterface* Material = LoadObject<UMaterialInterface>(
+		GetWorld(), *Path);
 
 	SetGhostMaterial(Material);
 }
