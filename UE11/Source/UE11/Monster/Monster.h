@@ -3,6 +3,8 @@
 #pragma once
 
 #include "../CharacterBase.h"
+#include <Components\WidgetComponent.h>
+
 #include "Monster.generated.h"
 
 struct FConvertMaterial
@@ -28,17 +30,20 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		FMonsterInfo	mInfo;
+	FMonsterInfo		mInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		FName		mMonsterTableRowName;
+	FName				mMonsterTableRowName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UWidgetComponent*	mWidgetComponent;
+
+	float	mRatio;
 
 	AActor* mHitActor;
-
 	EPatrolType	mPatrolType;
 
 	class UMonsterAnimInstance* mAnimInst;
-
 	class AMonsterSpawnPoint* mSpawnPoint;
 
 	bool		mAttackEnd;

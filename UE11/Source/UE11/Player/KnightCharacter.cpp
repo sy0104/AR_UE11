@@ -9,6 +9,8 @@
 #include "../Particle/Decal.h"
 #include "../Item/WeaponActor.h"
 #include "../Skill/Ghost.h"
+#include "../UE11GameModeBase.h"
+#include "../UMG/MainHUDBase.h"
 
 AKnightCharacter::AKnightCharacter()
 {
@@ -150,9 +152,7 @@ void AKnightCharacter::Tick(float DeltaTime)
 
 			// 잔상 생성
 			FActorSpawnParameters	SpawnParam;
-			//SpawnParam.Template = mHitActor;
-			SpawnParam.SpawnCollisionHandlingOverride =
-				ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 			AGhost* Ghost =
 				GetWorld()->SpawnActor<AGhost>(
@@ -175,23 +175,21 @@ void AKnightCharacter::Tick(float DeltaTime)
 
 void AKnightCharacter::NormalAttackCheck()
 {
+	{
+		// HPBar 연동 테스트
+		AUE11GameModeBase* GameMode = Cast<AUE11GameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		UMainHUDBase* MainHUD = GameMode->GetMainHUD();
+		static float Ratio = 1.f;
+		Ratio -= 0.1f;
+		MainHUD->SetHP(Ratio);
+	}
+
 	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
 
-	FVector	StartLocation = GetActorLocation() +
-		GetActorForwardVector() * 30.f;
-	FVector	EndLocation = StartLocation +
-		GetActorForwardVector() * State->GetInfo().AttackDistance;
+	FVector	StartLocation = GetActorLocation() + GetActorForwardVector() * 30.f;
+	FVector	EndLocation = StartLocation + GetActorForwardVector() * State->GetInfo().AttackDistance;
 
 	FCollisionQueryParams	param(NAME_None, false, this);
-
-	// 원하는 액터를 추가해서 탐색에서 제외시킬 수 있다.
-	//param.AddIgnoredActor()
-
-	// 충돌 결과로 물리적인 재질 여부를 가지고 올지를 결정한다.
-	//param.bReturnPhysicalMaterial
-
-	// 복잡한 충돌에 대해서 추적해야 하는지 여부
-	//param.bTraceComplex
 
 	TArray<FHitResult>	CollisionResult;
 	bool CollisionEnable = GetWorld()->SweepMultiByChannel(
@@ -224,43 +222,18 @@ void AKnightCharacter::NormalAttackCheck()
 
 		for (int32 i = 0; i < Count; ++i)
 		{
-			/*
-			언리얼엔진의 CDO(Class Default Object) : 모든 언리얼 클래스들은
-			CDO가 만들어진다. CDO는 해당 클래스의 기본 객체를 생성해두는 개념이다.
-
-			FActorSpawnParameters 구조체 주요 멤버
-			FName Name : 스폰되는 액터의 이름을 지정할 수 있다.
-
-			AActor* Template : 액터를 스폰할때 템플릿으로 사용할 액터를 지정한다.
-			nullptr로 남겨두게 되면 CDO를 이용해서 스폰하는 객체를 초기화 하고
-			지정이 되면 해당 객체를 이용해서 액터를 초기화 한다.
-
-			AActor* Owner : 이 액터를 스폰한 액터를 지정한다.
-
-			class	ULevel* OverrideLevel : 원하는 레벨을 지정하여
-			해당 레벨에 스폰시킨다. 
-
-			ESpawnActorCollisionHandlingMethod SpawnCollisionHandlingOverride :
-			액터를 스폰시키는 방법을 지정한다.
-			*/
 			FActorSpawnParameters	SpawnParam;
-			//SpawnParam.Template = mHitActor;
-			SpawnParam.SpawnCollisionHandlingOverride =
-				ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 			AParticleCascade* Particle = 
 				GetWorld()->SpawnActor<AParticleCascade>(
-				CollisionResult[i].ImpactPoint,
-				CollisionResult[i].ImpactNormal.Rotation(),
-					SpawnParam);
+				CollisionResult[i].ImpactPoint, CollisionResult[i].ImpactNormal.Rotation(), SpawnParam);
 
 			Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
 			Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
 
 			CollisionResult[i].GetActor()->TakeDamage(
-				(float)State->mPlayerInfo.AttackPoint,
-				FDamageEvent(), GetController(), this);
-			//Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
+				(float)State->mPlayerInfo.AttackPoint, FDamageEvent(), GetController(), this);
 		}
 	}
 }

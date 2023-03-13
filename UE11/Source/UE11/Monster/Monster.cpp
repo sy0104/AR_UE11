@@ -6,12 +6,18 @@
 #include "MonsterSpawnPoint.h"
 #include "../UE11GameInstance.h"
 #include "MonsterAIController.h"
+#include "../UMG/MonsterHPBase.h"
 
 // Sets default values
 AMonster::AMonster()
+	: mRatio(1.f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// 몬스터의 HP UI를 표현해 줄 WidgetComponent를 추가한다.
+	mWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetCom"));
+	mWidgetComponent->SetupAttachment(GetMesh());
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -91,11 +97,8 @@ void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UUE11GameInstance* GameInst = 
-		GetWorld()->GetGameInstance<UUE11GameInstance>();
-
-	const FMonsterTableInfo* Info = 
-		GameInst->FindMonsterTable(mMonsterTableRowName);
+	UUE11GameInstance* GameInst = GetWorld()->GetGameInstance<UUE11GameInstance>();
+	const FMonsterTableInfo* Info = GameInst->FindMonsterTable(mMonsterTableRowName);
 
 	if (Info)
 	{
@@ -119,7 +122,6 @@ void AMonster::BeginPlay()
 		GetCharacterMovement()->MaxWalkSpeedCrouched = mInfo.MoveSpeed * 0.5f;
 
 		GetMesh()->SetSkeletalMesh(Info->Mesh);
-
 		GetMesh()->SetAnimInstanceClass(Info->MonsterAnimClass);
 
 		int32	IndexCount = mDissolveMtrlIndexArray.Num();
@@ -127,8 +129,7 @@ void AMonster::BeginPlay()
 		for (int32 i = 0; i < IndexCount; ++i)
 		{
 			UMaterialInstanceDynamic* Mtrl = 
-				GetMesh()->CreateDynamicMaterialInstance(mDissolveMtrlIndexArray[i].Index,
-					mDissolveMtrlIndexArray[i].Mtrl);
+				GetMesh()->CreateDynamicMaterialInstance(mDissolveMtrlIndexArray[i].Index, mDissolveMtrlIndexArray[i].Mtrl);
 
 			mDissolveMtrlArray.Add(Mtrl);
 		}
@@ -136,7 +137,10 @@ void AMonster::BeginPlay()
 	
 	mAnimInst = Cast<UMonsterAnimInstance>(GetMesh()->GetAnimInstance());
 
-
+	// 위젯 컴포넌트가 지정한 MonsterHPBase 위젯에 프로그레스 바를 조정한다.
+	UMonsterHPBase* HPWidget = Cast<UMonsterHPBase>(mWidgetComponent->GetWidget());
+	if (IsValid(HPWidget))
+		HPWidget->SetInitHP(1.f);
 }
 
 // Called every frame
@@ -144,13 +148,21 @@ void AMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 몬스터 HPBar 테스트
+	{
+		UMonsterHPBase* HPWidget = Cast<UMonsterHPBase>(mWidgetComponent->GetWidget());
+		mRatio -= DeltaTime * 0.05f;
+
+		if (IsValid(HPWidget))
+			HPWidget->SetHP(mRatio);
+	}
+
 	// 현재 패트롤 상태일 경우 속도벡터를 이용하여 이동양을 구한다.
 	if (mPatrolEnable)
 	{
 		// 현재 도착지점의 인덱스를 이용해서 그 값을 넘어갈 경우 해당 값으로
 		// 고정하여 거기까지만 이동할 수 있도록 한다.
-		mPatrolCurrentDistance += (GetCharacterMovement()->MaxWalkSpeed *
-			DeltaTime * mPatrolIndexAdd);
+		mPatrolCurrentDistance += (GetCharacterMovement()->MaxWalkSpeed * DeltaTime * mPatrolIndexAdd);
 
 		if (GetArrive())
 		{
