@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <Blueprint\UserWidget.h>
+#include "UMG\MainHUDBase.h"
+
 #include "GameInfo.h"
 #include "GameFramework/GameModeBase.h"
 #include "UE11GameModeBase.generated.h"
@@ -16,6 +19,10 @@ class UE11_API AUE11GameModeBase : public AGameModeBase
 	
 public:
 	AUE11GameModeBase();
+
+private:
+	TSubclassOf<UUserWidget>	mMainHUDClass;
+	UMainHUDBase*				mMainHUD;		// UsetWidget으로 만들어진 진짜 객체를 가리키는 포인터
 
 public:
 	virtual void BeginPlay()	override;

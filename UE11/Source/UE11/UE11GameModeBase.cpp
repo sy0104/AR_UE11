@@ -20,24 +20,40 @@ AUE11GameModeBase::AUE11GameModeBase()
 
 	// DefaultPawnClass 는 TSubClassOf 라는 객체를 받게 되어 있다.
 	// 이 객체는 클래스의 타입 정보를 담아두는 객체이다.
-	// 언리얼 클래스들은 내부에 static 멤버함수르 자신의 타입정보를
-	// 반환할 수 있는 함수를 가지고 있다.
-	// 타입::StaticClass() 함수를 이용하여 해당 타입의 타입 정보를
-	// 얻어올 수 있다.
+	// 언리얼 클래스들은 내부에 static 멤버함수르 자신의 타입정보를 반환할 수 있는 함수를 가지고 있다.
+	// 타입::StaticClass() 함수를 이용하여 해당 타입의 타입 정보를 얻어올 수 있다.
 	DefaultPawnClass = AKnightCharacter::StaticClass();
 	PlayerControllerClass = AUE11PlayerController::StaticClass();
 	PlayerStateClass = AUE11PlayerState::StaticClass();
+
+	// UI_MainHUD 블루프린트 클래스의 UClass 정보를 가져온다.
+	ConstructorHelpers::FClassFinder<UUserWidget>
+		finder(TEXT("WidgetBlueprint'/Game/Blueprints/UIClass/UMG/UI_MainHUD.UI_MainHUD_C'"));
+
+	if (finder.Succeeded())
+		mMainHUDClass = finder.Class;	// 자료형에 대한 고유 정보를 저장해둔다.
 }
 
-// 아래 함수들은 InitGame -> PostLogin -> BeginPlay 함수 순서로
-// 호출이 된다.
+// 아래 함수들은 InitGame -> PostLogin -> BeginPlay 함수 순서로 호출이 된다.
 void AUE11GameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 위젯 블루프린트 UClass 정보를 이용해서 객체를 만들어낸다.
+	if (IsValid(mMainHUDClass))
+	{
+		// 생성한 객체의 주소를 mMainHUD에 받아둔다.
+		mMainHUD = Cast<UMainHUDBase>(CreateWidget(GetWorld(), mMainHUDClass));
+
+		if (IsValid(mMainHUD))
+		{
+			mMainHUD->AddToViewport();
+		}
+
+	}
 }
 
-void AUE11GameModeBase::InitGame(const FString& MapName, 
-	const FString& Options, FString& ErrorMessage)
+void AUE11GameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 }
