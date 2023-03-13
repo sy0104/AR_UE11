@@ -51,8 +51,8 @@ APlayerCharacter::APlayerCharacter()
 
 	mWeapon = nullptr;
 
-	GetMesh()->SetRenderCustomDepth(true);
-	GetMesh()->SetCustomDepthStencilValue(12);
+	//GetMesh()->SetRenderCustomDepth(true);
+	//GetMesh()->SetCustomDepthStencilValue(12);
 }
 
 // Called when the game starts or when spawned

@@ -3,12 +3,11 @@
 #pragma once
 
 // ../는 이전 폴더를 의미한다.
-#include "../GameInfo.h"
-#include "GameFramework/Character.h"
+#include "../CharacterBase.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
-class UE11_API APlayerCharacter : public ACharacter
+class UE11_API APlayerCharacter : public ACharacterBase
 {
 	GENERATED_BODY()
 

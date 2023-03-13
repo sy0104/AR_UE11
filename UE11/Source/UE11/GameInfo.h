@@ -201,6 +201,20 @@ enum class EPatrolType : uint8
 	Spline
 };
 
+UENUM(BlueprintType)
+enum class EOutLineColor : uint8
+{
+	Color1,
+	Color2,
+	Color3,
+	Color4,
+	Color5,
+	Color6,
+	Color7,
+	Color8,
+	Color9
+};
+
 
 
 

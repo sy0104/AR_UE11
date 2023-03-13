@@ -3,6 +3,7 @@
 
 #include "UE11PlayerController.h"
 #include "../Particle/Decal.h"
+#include "../CharacterBase.h"
 
 AUE11PlayerController::AUE11PlayerController()
 {
@@ -40,7 +41,45 @@ void AUE11PlayerController::Tick(float DeltaTime)
 
 	if (Hit)
 	{
-		mMousePick->SetActorLocation(result.ImpactPoint);
+		if (mPickActor.IsValid() && mPickActor.Get() != result.GetActor())
+		{
+			ACharacterBase* CharacterBase = Cast<ACharacterBase>(mPickActor.Get());
+
+			if (IsValid(CharacterBase))
+				CharacterBase->OnOutLine(false);
+		}
+
+
+		if (mPickActor.Get() != result.GetActor())
+		{
+			mPickActor = result.GetActor();
+
+			// 물체가 Player나 Monster일 경우 아웃라인을 처리한다.
+			ACharacterBase* CharacterBase = Cast<ACharacterBase>(result.GetActor());
+
+			if (IsValid(CharacterBase))
+			{
+				mMousePick->SetDecalVisibility(false);
+				CharacterBase->OnOutLine(true);
+			}
+
+			else
+			{
+				mMousePick->SetDecalVisibility(true);
+				mMousePick->SetActorLocation(result.ImpactPoint);
+			}
+		}
+	}
+
+	else if (mPickActor.IsValid())
+	{
+		ACharacterBase* CharacterBase = Cast<ACharacterBase>(mPickActor.Get());
+
+		if (IsValid(CharacterBase))
+			CharacterBase->OnOutLine(false);
+
+		mPickActor = nullptr;
+		mMousePick->SetDecalVisibility(false);
 	}
 
 	mMousePick->AddActorWorldRotation(FRotator(0.f, 180.f * DeltaTime, 0.f));
@@ -72,6 +111,17 @@ void AUE11PlayerController::OnUnPossess()
 
 void AUE11PlayerController::SpawnMousePick()
 {
+	if (mPickActor.IsValid())
+	{
+		ACharacterBase* CharacterBase = Cast<ACharacterBase>(mPickActor.Get());
+
+		if (IsValid(CharacterBase))
+			return;
+	}
+
+	else
+		return;
+
 	FActorSpawnParameters	SpawnParam;
 	SpawnParam.SpawnCollisionHandlingOverride =
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

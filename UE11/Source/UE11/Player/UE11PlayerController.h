@@ -18,6 +18,11 @@ public:
 	AUE11PlayerController();
 
 protected:
+	// TWeakPtr은 참조카운팅을 안한다.
+	// 대상이 소멸하면 자동으로 nullptr이 된다.
+	// TWeakPtr은 UObject를 못다룬다.
+	// TWeakObjectPtr은 UObject를 다룬다.
+	TWeakObjectPtr<AActor> mPickActor;
 	class ADecal* mMousePick;
 
 protected:

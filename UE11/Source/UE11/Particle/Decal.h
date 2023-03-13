@@ -49,6 +49,10 @@ public:
 	}
 
 	void SetDecalMaterial(const FString& Path);
+	void SetDecalVisibility(bool Visible)
+	{
+		mDecal->SetVisibility(Visible);
+	}
 
 protected:
 	// Called when the game starts or when spawned

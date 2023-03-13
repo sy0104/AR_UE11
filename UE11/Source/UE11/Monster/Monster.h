@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "../GameInfo.h"
-#include "GameFramework/Character.h"
+#include "../CharacterBase.h"
 #include "Monster.generated.h"
 
 struct FConvertMaterial
@@ -19,7 +18,7 @@ struct FConvertMaterial
 };
 
 UCLASS()
-class UE11_API AMonster : public ACharacter
+class UE11_API AMonster : public ACharacterBase
 {
 	GENERATED_BODY()
 

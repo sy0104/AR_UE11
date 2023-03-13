@@ -41,8 +41,8 @@ AMonster::AMonster()
 	mDissolve = 0.f;
 	mDissolveRange = mDissolveMax - mDissolveMin;
 
-	GetMesh()->SetRenderCustomDepth(true);
-	GetMesh()->SetCustomDepthStencilValue(16);
+	//GetMesh()->SetRenderCustomDepth(true);
+	//GetMesh()->SetCustomDepthStencilValue(16);
 }
 
 FVector AMonster::GetPatrolLocation() const
