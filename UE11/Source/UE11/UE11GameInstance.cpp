@@ -20,6 +20,10 @@ UUE11GameInstance::UUE11GameInstance()
 
 	if (MonsterTable.Succeeded())
 		m_MonsterTable = MonsterTable.Object;
+
+	static ConstructorHelpers::FObjectFinder<UDataTable>	ItemTable(TEXT("DataTable'/Game/Blueprints/UIClass/ItemDataTable.ItemDataTable'"));
+	if (ItemTable.Succeeded())
+		mItemTable = ItemTable.Object;
 }
 
 UUE11GameInstance::~UUE11GameInstance()

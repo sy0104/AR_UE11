@@ -5,6 +5,7 @@
 #include <Blueprint\UserWidget.h>
 
 #include "PlayerInfoBase.h"
+#include "InventoryBase.h"
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
@@ -20,7 +21,8 @@ class UE11_API UMainHUDBase : public UUserWidget
 
 private:
 	UPlayerInfoBase*	mPlayerInfo;	// MainHUD에서 PlayerInfo에 빠르기 접근하기 위한 포인터 변수
-	
+	UInventoryBase*		mInventory;
+
 public:
 	// Ratio: 0.f ~ 1.f
 	void SetHP(float Ratio);

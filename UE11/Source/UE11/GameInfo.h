@@ -216,8 +216,71 @@ enum class EOutLineColor : uint8
 };
 
 
+// Item Á¤º¸
+
+UENUM(BlueprintType)
+enum class EItemType : uint8
+{
+	EQUIP_WEAPON,
+	EQUIP_ARMOR,
+	EQUIP_ACCESARY,
+
+	CONSUMABLE,
+	QUEST,
+};
 
 
+UENUM(BlueprintType)
+enum class EItemID : uint8
+{
+	CI_POTION,
+	CI_POTION_MID,
+	CI_POTION_MEGA,
+
+	EW_GREATSWORD,
+	EW_LONGBOW,
+	EW_POISONDAGGER,
+
+	EA_LEATHERARMOR,
+	EA_KNIGHTARMOA,
+
+	AC_RING,
+	AC_NECKELESS,
+};
+
+USTRUCT(Atomic, BlueprintType)
+struct FItemDataInfo : public FTableRowBase
+{
+	GENERATED_BODY();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EItemID		ID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EItemType	ItemType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString		ItemName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString		Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString		IconPath;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		HPHeal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		MPHeal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		Att;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float		Def;
+
+};
 
 
 

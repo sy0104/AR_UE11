@@ -19,7 +19,8 @@ public:
 	~UUE11GameInstance();
 
 private:
-	UDataTable* m_MonsterTable;
+	UDataTable*			m_MonsterTable;
+	UDataTable*			mItemTable;
 
 public:
 	virtual void Init();
