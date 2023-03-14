@@ -62,7 +62,7 @@ public:
 	void WeaponDetach();
 	void MouseMove();
 	void Skill2Key();
-
+	void InventoryOn();
 
 public:
 	virtual void NormalAttackCheck();

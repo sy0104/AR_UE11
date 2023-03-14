@@ -48,7 +48,7 @@ void AUE11GameModeBase::BeginPlay()
 		if (IsValid(mMainHUD))
 		{
 			mMainHUD->AddToViewport();
-			mMainHUD->SetHP(0.33f);
+			//mMainHUD->SetHP(0.33f);
 		}
 
 	}

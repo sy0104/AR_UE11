@@ -21,10 +21,13 @@ public:
 private:
 	UDataTable*			m_MonsterTable;
 	UDataTable*			mItemTable;
+	UInventoryManager*	mInven;
 
 public:
 	virtual void Init();
 
 public:
 	const FMonsterTableInfo* FindMonsterTable(const FName& Name);
+
+	friend class UInventoryManager;
 };

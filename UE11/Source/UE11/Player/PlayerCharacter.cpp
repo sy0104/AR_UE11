@@ -9,6 +9,7 @@
 #include "UE11PlayerController.h"
 #include "../Material/UE11PhysicalMaterial.h"
 #include "../Particle/ParticleCascade.h"
+#include "../Manager/InventoryManager.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -61,6 +62,9 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	mAnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+
+	// 게임 시작 시 인벤토리를 꺼준다. 현재 월드도 전달해준다.
+	UInventoryManager::GetInstance(GetWorld())->ShowInventory(false);
 }
 
 // Called every frame
@@ -118,14 +122,23 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		TEXT("Skill2"),
 		EInputEvent::IE_Pressed, this,
 		&APlayerCharacter::Skill2Key);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("Skill2"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::Skill2Key);
+
+	FInputActionBinding& toggle = PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("Inventory"), EInputEvent::IE_Pressed, this, &APlayerCharacter::InventoryOn);
+
+	toggle.bConsumeInput = false;
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, 
 	FDamageEvent const& DamageEvent, AController* EventInstigator, 
 	AActor* DamageCauser)
 {
-	float Damage = Super::TakeDamage(DamageAmount, DamageEvent,
-		EventInstigator, DamageCauser);
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	return Damage;
 }
@@ -303,6 +316,12 @@ void APlayerCharacter::MouseMove()
 void APlayerCharacter::Skill2Key()
 {
 	Skill2();
+}
+
+void APlayerCharacter::InventoryOn()
+{
+	// InventoryManager에 접근, 인벤토리가 꺼져있으면 켜준다.
+	UInventoryManager::GetInstance(GetWorld())->ShowInventory(true);
 }
 
 void APlayerCharacter::NormalAttackCheck()

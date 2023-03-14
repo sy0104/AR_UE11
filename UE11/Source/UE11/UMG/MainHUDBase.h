@@ -30,4 +30,10 @@ public:
 public:
 	virtual void NativeConstruct() override;										// BeginPlay() 역할
 	virtual void NativeTick(const FGeometry& _geo, float _DeltaTime) override;		// Tick() 역할
+
+public:
+	UInventoryBase* GetInventoryWidget()
+	{
+		return mInventory;
+	}
 };

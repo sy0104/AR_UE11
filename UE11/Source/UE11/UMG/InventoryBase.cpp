@@ -9,7 +9,6 @@ void UInventoryBase::NativeConstruct()
 	Super::NativeConstruct();
 
 	mListView = Cast<UListView>(GetWidgetFromName(FName(TEXT("ListView"))));
-	mListView->SetVisibility(ESlateVisibility::Visible);
 
 	// Item Ãß°¡
 	UItemDataBase* NewData = NewObject<UItemDataBase>();

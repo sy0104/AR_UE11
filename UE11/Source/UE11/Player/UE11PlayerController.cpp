@@ -24,11 +24,13 @@ void AUE11PlayerController::BeginPlay()
 	FInputModeGameAndUI	Mode;
 	SetInputMode(Mode);
 
-	mMousePick = GetWorld()->SpawnActor<ADecal>(FVector::ZeroVector,
-		FRotator::ZeroRotator);
+	mMousePick = GetWorld()->SpawnActor<ADecal>(FVector::ZeroVector, FRotator::ZeroRotator);
 
 	mMousePick->SetDecalMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/MTMagicCircle_Inst.MTMagicCircle_Inst'"));
 	mMousePick->SetSpawnType(EDecalSpawnType::Floor);
+
+	// 마우스 위에 있는 액터를 인지하는 기능 On
+	bEnableMouseOverEvents = true;
 }
 
 void AUE11PlayerController::Tick(float DeltaTime)
