@@ -284,7 +284,13 @@ struct FItemDataInfo : public FTableRowBase
 
 };
 
-
+UENUM(BlueprintType)
+enum class ETriggerShape : uint8
+{
+	Box,
+	Sphere,
+	Capsule
+};
 
 /**
  * 
