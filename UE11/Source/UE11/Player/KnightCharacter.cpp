@@ -4,6 +4,7 @@
 #include "KnightCharacter.h"
 #include "UE11PlayerState.h"
 #include "../Particle/ParticleCascade.h"
+#include "../Particle/ParticleNiagara.h"
 #include "PlayerAnimInstance.h"
 #include "../Skill/SkillProjectile.h"
 #include "../Particle/Decal.h"
@@ -205,9 +206,8 @@ void AKnightCharacter::NormalAttackCheck()
 	// CollisionEnable 가 true이면 Red, false이면 Green을 저장한다.
 	FColor	DrawColor = CollisionEnable ? FColor::Red : FColor::Green;
 
-	// FRotationMatrix::MakeFromZ(GetActorForwardVector()) : 앞쪽을
-	// 바라보는 회전행렬을 만들어서 .ToQuat() 함수를 이용하여 회전행렬을
-	// 회전값으로 변환해준다.
+	// FRotationMatrix::MakeFromZ(GetActorForwardVector())
+	// 앞쪽을 바라보는 회전행렬을 만들어서 .ToQuat() 함수를 이용하여 회전행렬을 회전값으로 변환해준다.
 	DrawDebugCapsule(GetWorld(), (StartLocation + EndLocation) / 2.f,
 		State->GetInfo().AttackDistance / 2.f,
 		50.f, 
@@ -225,11 +225,11 @@ void AKnightCharacter::NormalAttackCheck()
 			FActorSpawnParameters	SpawnParam;
 			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-			AParticleCascade* Particle = 
-				GetWorld()->SpawnActor<AParticleCascade>(
+			AParticleNiagara* Particle = 
+				GetWorld()->SpawnActor<AParticleNiagara>(
 				CollisionResult[i].ImpactPoint, CollisionResult[i].ImpactNormal.Rotation(), SpawnParam);
 
-			Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
+			Particle->SetParticle(TEXT("NiagaraSystem'/Game/Hack_And_Slash_FX/VFX_Niagara/Impacts/NS_Lightning_Slash_Impact.NS_Lightning_Slash_Impact'"));
 			Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
 
 			CollisionResult[i].GetActor()->TakeDamage(

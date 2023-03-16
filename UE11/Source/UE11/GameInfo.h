@@ -11,6 +11,8 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/SplineComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"
