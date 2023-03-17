@@ -22,21 +22,22 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	USceneComponent*	mRoot;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UBoxComponent*		mBox;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	USphereComponent*	mSphere;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UCapsuleComponent*	mCapsule;
-
-	bool		mStart;
 
 public:
 	void ChangeShape(ETriggerShape Shape);
 	void ChangeCollisionProfile(const FString& Name);
 	void EnableCollision(bool Enable);		// 콜리젼의 활성, 비활성 체크
+
+public:
+	virtual void OnConstruction(const FTransform& Transform);
 
 protected:
 	// Called when the game starts or when spawned

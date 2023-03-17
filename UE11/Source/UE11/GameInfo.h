@@ -13,6 +13,12 @@
 #include "Components/SplineComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "LevelSequence.h"
+#include "LevelSequencePlayer.h"
+#include "MediaPlayer.h"
+#include "MediaTexture.h"
+#include "MediaSoundComponent.h"
+#include "MediaSource.h"
 
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"

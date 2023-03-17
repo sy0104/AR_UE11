@@ -16,10 +16,9 @@ ATriggerShape::ATriggerShape()
 
 	mShape = ETriggerShape::Box;
 	
-	mBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
-	mBox->SetupAttachment(mRoot);
-
-	mStart = false;
+	//mBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	//mBox->SetupAttachment(mRoot);
+	//mBox->SetCollisionProfileName(TEXT("PlayerTrigger"));
 }
 
 void ATriggerShape::ChangeShape(ETriggerShape Shape)
@@ -28,64 +27,56 @@ void ATriggerShape::ChangeShape(ETriggerShape Shape)
 	if (mShape == Shape)
 		return;
 
-	// 바꿔줄 모양으로 객체를 생성해주고, root에 붙여준다.
-	switch (Shape)
+	if (mBox)
 	{
-	case ETriggerShape::Box:
-		mBox = NewObject<UBoxComponent>(this, UBoxComponent::StaticClass());
-		mBox->SetupAttachment(mRoot);
-		break;
-	case ETriggerShape::Sphere:
-		mSphere = NewObject<USphereComponent>(this, USphereComponent::StaticClass());
-		mSphere->SetupAttachment(mRoot);
-		break;
-	case ETriggerShape::Capsule:
-		mCapsule = NewObject<UCapsuleComponent>(this, UBoxComponent::StaticClass());
-		mCapsule->SetupAttachment(mRoot);
-		break;
-	}
-
-	// 원래 있던 모양을 root에서 떼어주고 없애준다.
-	switch (mShape)
-	{
-	case ETriggerShape::Box:
 		mBox->DetachFromParent();
 		mBox->DestroyComponent();
 		mBox = nullptr;
-		break;
-	case ETriggerShape::Sphere:
+	}
+
+	else if (mSphere)
+	{
 		mSphere->DetachFromParent();
 		mSphere->DestroyComponent();
 		mSphere = nullptr;
-		break;
-	case ETriggerShape::Capsule:
+	}
+
+	else if (mCapsule)
+	{
 		mCapsule->DetachFromParent();
 		mCapsule->DestroyComponent();
 		mCapsule = nullptr;
+	}
+
+	switch (Shape)
+	{
+	case ETriggerShape::Box:
+		mBox = NewObject<UBoxComponent>(this, UBoxComponent::StaticClass(), TEXT("Box"));
+		mBox->RegisterComponent();
+		mBox->AttachToComponent(mRoot, FAttachmentTransformRules::KeepRelativeTransform);
+
+		mBox->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
+		mBox->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
+		break;
+	case ETriggerShape::Sphere:
+		mSphere = NewObject<USphereComponent>(this, USphereComponent::StaticClass(), TEXT("Sphere"));
+		mSphere->RegisterComponent();
+		mSphere->AttachToComponent(mRoot, FAttachmentTransformRules::KeepRelativeTransform);
+
+		mSphere->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
+		mSphere->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
+		break;
+	case ETriggerShape::Capsule:
+		mCapsule = NewObject<UCapsuleComponent>(this, UCapsuleComponent::StaticClass(), TEXT("Capsule"));
+		mCapsule->RegisterComponent();
+		mCapsule->AttachToComponent(mRoot, FAttachmentTransformRules::KeepRelativeTransform);
+
+		mCapsule->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
+		mCapsule->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
 		break;
 	}
 
-	// 멤버변수로 바뀐 모양을 담고 있는다.
 	mShape = Shape;
-
-	if (mStart)
-	{
-		switch (mShape)
-		{
-		case ETriggerShape::Box:
-			mBox->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
-			mBox->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
-			break;
-		case ETriggerShape::Sphere:
-			mSphere->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
-			mSphere->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
-			break;
-		case ETriggerShape::Capsule:
-			mCapsule->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
-			mCapsule->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
-			break;
-		}
-	}
 }
 
 void ATriggerShape::ChangeCollisionProfile(const FString& Name)
@@ -129,28 +120,79 @@ void ATriggerShape::EnableCollision(bool Enable)
 	}
 }
 
+// 블루프린트의 Construction과 같은 역할을 한다.
+// 에디터에서 바뀌자마자 호출된다. (위치를 바꿀때도 호출된다)
+// 실시간으로 갱신되어야 할 때 사용한다.
+void ATriggerShape::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	if (mBox && mShape == ETriggerShape::Box)
+		return;
+
+	else if (mSphere && mShape == ETriggerShape::Sphere)
+		return;
+
+	else if (mCapsule && mShape == ETriggerShape::Capsule)
+		return;
+
+	if (mBox)
+	{
+		mBox->DetachFromParent();
+		mBox->DestroyComponent();
+		mBox = nullptr;
+	}
+
+	else if (mSphere)
+	{
+		mSphere->DetachFromParent();
+		mSphere->DestroyComponent();
+		mSphere = nullptr;
+	}
+
+	else if (mCapsule)
+	{
+		mCapsule->DetachFromParent();
+		mCapsule->DestroyComponent();
+		mCapsule = nullptr;
+	}
+
+	switch (mShape)
+	{
+	case ETriggerShape::Box:
+		mBox = NewObject<UBoxComponent>(this, UBoxComponent::StaticClass(), TEXT("Box"));
+		mBox->RegisterComponent();
+		mBox->AttachToComponent(mRoot, FAttachmentTransformRules::KeepRelativeTransform);
+
+		mBox->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
+		mBox->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
+		break;
+	case ETriggerShape::Sphere:
+		mSphere = NewObject<USphereComponent>(this, USphereComponent::StaticClass(), TEXT("Sphere"));
+		mSphere->RegisterComponent();
+		mSphere->AttachToComponent(mRoot, FAttachmentTransformRules::KeepRelativeTransform);
+
+		mSphere->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
+		mSphere->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
+		break;
+	case ETriggerShape::Capsule:
+		mCapsule = NewObject<UCapsuleComponent>(this, UCapsuleComponent::StaticClass(), TEXT("Capsule"));
+		mCapsule->RegisterComponent();
+		mCapsule->AttachToComponent(mRoot, FAttachmentTransformRules::KeepRelativeTransform);
+
+		mCapsule->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
+		mCapsule->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
+		break;
+	}
+
+	ChangeCollisionProfile(TEXT("PlayerTrigger"));
+}
+
 // Called when the game starts or when spawned
 void ATriggerShape::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	mStart = true;
-
-	switch (mShape)
-	{
-	case ETriggerShape::Box:
-		mBox->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
-		mBox->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
-		break;
-	case ETriggerShape::Sphere:
-		mSphere->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
-		mSphere->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
-		break;
-	case ETriggerShape::Capsule:
-		mCapsule->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
-		mCapsule->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
-		break;
-	}
 }
 
 // Called every frame

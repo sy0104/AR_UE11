@@ -18,6 +18,9 @@ public class UE11 : ModuleRules
             , "NavigationSystem"
             , "UMG"
             , "Niagara"
+			, "MovieScene"
+            , "LevelSequence"
+            , "MediaAssets"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
