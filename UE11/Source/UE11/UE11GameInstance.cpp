@@ -38,3 +38,8 @@ const FMonsterTableInfo* UUE11GameInstance::FindMonsterTable(const FName& Name)
 	// 실패할 경우 출력할 메시지를 FString 타입으로 전달한다.
 	return m_MonsterTable->FindRow<FMonsterTableInfo>(Name, TEXT(""));
 }
+
+const FSkillData* UUE11GameInstance::FindMonsterSkillTable(const FName& Name)
+{
+	return mMonsterSkillInfoTable->FindRow<FSkillData>(Name, TEXT(""));
+}

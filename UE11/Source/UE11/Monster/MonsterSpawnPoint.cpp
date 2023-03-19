@@ -70,13 +70,10 @@ void AMonsterSpawnPoint::BeginPlay()
 		mSpawnCount = mSpawnCount < 1 ? 1 : mSpawnCount;
 
 		FActorSpawnParameters	SpawnParam;
-		SpawnParam.SpawnCollisionHandlingOverride =
-			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 		AMonster* SpawnMonster =
-			GetWorld()->SpawnActor<AMonster>(mSpawnClass,
-				GetActorLocation(), GetActorRotation(),
-				SpawnParam);
+			GetWorld()->SpawnActor<AMonster>(mSpawnClass, GetActorLocation(), GetActorRotation(), SpawnParam);
 
 		SpawnMonster->SetSpawnPoint(this);
 		SpawnMonster->SetPatrolPointLocation(mPatrolPointLocationArray);
@@ -109,13 +106,10 @@ void AMonsterSpawnPoint::Tick(float DeltaTime)
 				mTime -= mSpawnTime;
 
 				FActorSpawnParameters	SpawnParam;
-				SpawnParam.SpawnCollisionHandlingOverride =
-					ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 				AMonster* SpawnMonster =
-					GetWorld()->SpawnActor<AMonster>(mSpawnClass,
-						GetActorLocation(), GetActorRotation(),
-						SpawnParam);
+					GetWorld()->SpawnActor<AMonster>(mSpawnClass, GetActorLocation(), GetActorRotation(), SpawnParam);
 
 				SpawnMonster->SetSpawnPoint(this);
 				SpawnMonster->SetPatrolPointLocation(mPatrolPointLocationArray);
@@ -177,16 +171,14 @@ void AMonsterSpawnPoint::ComputeSpline()
 
 	for (int32 i = 0; i <= mDivideCount; ++i)
 	{
-		FVector	Point = mPatrolSpline->GetLocationAtDistanceAlongSpline(
-			mCellDistance * i, ESplineCoordinateSpace::World);
+		FVector	Point = mPatrolSpline->GetLocationAtDistanceAlongSpline(mCellDistance * i, ESplineCoordinateSpace::World);
 
 		mSplinePoint.Add(Point);
 
 		// 얻어온 월드위치를 로컬 위치로 변경도 가능하다.
 		FVector	LocalPoint = ActorTr.InverseTransformPosition(Point);
 
-		FRotator	Rot = mPatrolSpline->GetRotationAtDistanceAlongSpline(
-			mCellDistance * i, ESplineCoordinateSpace::World);
+		FRotator Rot = mPatrolSpline->GetRotationAtDistanceAlongSpline(mCellDistance * i, ESplineCoordinateSpace::World);
 
 		mSplineRotation.Add(Rot);
 
@@ -203,11 +195,8 @@ void AMonsterSpawnPoint::ComputeSpline()
 				MeshTr.SetScale3D(FVector(0.1f, 0.1f, 0.1f));
 				
 				MeshCom->SetRelativeTransform(MeshTr);
-
 				MeshCom->SetWorldRotation(Rot);
-
 				MeshCom->SetStaticMesh(mDivideMesh);
-
 				MeshCom->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 				mMeshArray.Add(MeshCom);

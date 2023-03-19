@@ -47,6 +47,8 @@ AMonster::AMonster()
 	mDissolve = 0.f;
 	mDissolveRange = mDissolveMax - mDissolveMin;
 
+	mSkillEnable = false;
+
 	//GetMesh()->SetRenderCustomDepth(true);
 	//GetMesh()->SetCustomDepthStencilValue(16);
 }
@@ -219,7 +221,6 @@ float AMonster::TakeDamage(float DamageAmount,
 		EventInstigator, DamageCauser);
 
 	Damage = Damage - mInfo.ArmorPoint;
-
 	Damage = Damage < 1 ? 1 : Damage;
 
 	mInfo.HP -= Damage;
@@ -251,10 +252,8 @@ void AMonster::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와
-	// Blackboard를 지정해준다.
-	AMonsterAIController* AI =
-		Cast<AMonsterAIController>(NewController);
+	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와 Blackboard를 지정해준다.
+	AMonsterAIController* AI = Cast<AMonsterAIController>(NewController);
 
 	if (IsValid(AI))
 	{
@@ -270,4 +269,25 @@ void AMonster::UnPossessed()
 
 void AMonster::Attack()
 {
+}
+
+void AMonster::PauseAI()
+{
+	AAIController* AI = Cast<AAIController>(GetController());
+
+	if (IsValid(AI))
+		AI->BrainComponent->StopLogic(TEXT("Pause"));
+
+	PrintViewport(1.f, FColor::Red, TEXT("Pause AI"));
+}
+
+void AMonster::ReStartAI()
+{
+	AAIController* AI = Cast<AAIController>(GetController());
+
+	if (IsValid(AI))
+		AI->BrainComponent->StartLogic();
+
+	PrintViewport(1.f, FColor::Red, TEXT("ReStart AI"));
+
 }

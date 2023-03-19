@@ -83,6 +83,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float				mDissolveMax;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	bool				mSkillEnable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FMonsterSkillInfo>	mSkillDataArray;
+
 public:
 	bool GetArrive()	const
 	{
@@ -269,4 +275,11 @@ public:
 
 public:
 	virtual void Attack();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void PauseAI();
+
+	UFUNCTION(BlueprintCallable)
+	void ReStartAI();
 };

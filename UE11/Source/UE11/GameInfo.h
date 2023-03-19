@@ -148,8 +148,7 @@ public:
 
 
 USTRUCT(BlueprintType)
-struct FMonsterTableInfo :
-	public FTableRowBase
+struct FMonsterTableInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -298,9 +297,123 @@ enum class ETriggerShape : uint8
 	Capsule
 };
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class ESkillType : uint8
+{
+	Passive,
+	Active
+};
+
+UENUM(BlueprintType)
+enum class ESkillSystem : uint8
+{
+	Attack_Single_Once,
+	Attack_Single_Duration,
+	Attack_Multi_Once,
+	Attack_Multi_Duration,
+	Buf_Single,
+	Buf_Multi
+};
+
+UENUM(BlueprintType)
+enum class ESkillOptionType : uint8
+{
+	Damage,
+	AttackUp,
+	ArmorUp,
+	HPRecovery,
+	MPRecovery
+};
+
+// Atomic: 이 구조체가 항상 하나의 단위로 직렬화된다.
+// 이 구조체가 에디터의 디테일 창에서 표시되고 수정 가능하기만 원한다면 지정자를 atomic으로 설정한다.
+USTRUCT(Atomic, BlueprintType)
+struct FSkillOption
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	ESkillOptionType	Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float				Option;
+};
+
+UENUM(BlueprintType)
+enum class ESkillEffectType : uint8
+{
+	Cast,
+	Play
+};
+
+USTRUCT(Atomic, BlueprintType)
+struct FSkillEffectData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	ESkillEffectType		Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UNiagaraSystem*			Effect;
+};
+
+USTRUCT(Atomic, BlueprintType)
+struct FSkillData : public FTableRowBase	// 데이터 테이블과 연동
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	ESkillType		Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	ESkillSystem	System;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString			SkillName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString			Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int32			LimitLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EPlayerJob		LimitJob;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FSkillOption>		SkillOptionArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FSkillEffectData>	SkillEffectArray;
+};
+
+USTRUCT(BlueprintType)
+struct FMonsterSkillInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	ESkillType		Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	ESkillSystem	System;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString			SkillName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString			Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FSkillOption>		SkillOptionArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FSkillEffectData>	SkillEffectArray;
+};
+
+
 UCLASS()
 class UE11_API UGameInfo : public UObject
 {

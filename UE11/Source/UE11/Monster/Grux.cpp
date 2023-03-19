@@ -1,32 +1,31 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MinionWarrior.h"
+#include "Grux.h"
 #include "MonsterAIController.h"
 #include "../Particle/ParticleCascade.h"
 
-AMinionWarrior::AMinionWarrior()
+AGrux::AGrux()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	/*static ConstructorHelpers::FObjectFinder<USkeletalMesh>	MeshAsset(TEXT("SkeletalMesh'/Game/ParagonMinions/Characters/Minions/Dusk_Minions/Meshes/Minion_Lane_Super_Dusk.Minion_Lane_Super_Dusk'"));
+	//static ConstructorHelpers::FObjectFinder<USkeletalMesh>	MeshAsset(TEXT("SkeletalMesh'/Game/ParagonMinions/Characters/Minions/Dusk_Minions/Meshes/Minion_Lane_Super_Dusk.Minion_Lane_Super_Dusk'"));
 
-	if (MeshAsset.Succeeded())
-		GetMesh()->SetSkeletalMesh(MeshAsset.Object);*/
+	//if (MeshAsset.Succeeded())
+	//GetMesh()->SetSkeletalMesh(MeshAsset.Object);
 
-	GetCapsuleComponent()->SetCapsuleHalfHeight(110.f);
-	GetCapsuleComponent()->SetCapsuleRadius(50.f);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(120.f);
+	GetCapsuleComponent()->SetCapsuleRadius(60.f);
 
-	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -110.f));
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -120.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
-	/*static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimClass(TEXT("AnimBlueprint'/Game/Monster/Animation/ABMinionWarrior.ABMinionWarrior_C'"));
+	//static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimClass(TEXT("AnimBlueprint'/Game/Monster/Animation/ABMinionWarrior.ABMinionWarrior_C'"));
 
-	if (AnimClass.Succeeded())
-		GetMesh()->SetAnimInstanceClass(AnimClass.Class);*/
+	//if (AnimClass.Succeeded())
+	//	GetMesh()->SetAnimInstanceClass(AnimClass.Class);
 
-	mMonsterTableRowName = TEXT("MinionWarrior");
-
+	mMonsterTableRowName = TEXT("Grux");
 
 	mHitActor = CreateDefaultSubobject<AParticleCascade>(TEXT("HitParticle"));
 
@@ -40,25 +39,26 @@ AMinionWarrior::AMinionWarrior()
 	mDissolveMtrlIndexArray.Add(Mtrl);
 }
 
-void AMinionWarrior::BeginPlay()
+void AGrux::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
-void AMinionWarrior::PossessedBy(AController* NewController)
+void AGrux::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// 다른 BehaviorTree나 BlackboardData를 사용하면 여기에서
-	// 다르게 지정해준다.
+	// 다른 BehaviorTree나 BlackboardData를 사용하면 여기에서 다르게 지정해준다.
+
 }
 
-void AMinionWarrior::UnPossessed()
+void AGrux::UnPossessed()
 {
 	Super::UnPossessed();
 }
 
-void AMinionWarrior::Attack()
+void AGrux::Attack()
 {
 	AAIController* MonsterController = Cast<AAIController>(GetController());
 	ACharacter* Target = Cast<ACharacter>(MonsterController->GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
