@@ -16,6 +16,9 @@ class UE11_API AGrux : public AMonster
 public:
 	AGrux();
 
+public:
+	virtual void OnConstruction(const FTransform& Transform);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,4 +29,7 @@ public:
 
 public:
 	virtual void Attack();
+	virtual void Skill1();
+	virtual void Skill2();
+	virtual void Skill3();
 };

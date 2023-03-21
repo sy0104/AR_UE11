@@ -49,6 +49,8 @@ AMonster::AMonster()
 
 	mSkillEnable = false;
 
+	mUseSkillIndex = -1;	// -1은 사용하는 스킬이 없다는 의미이다.
+
 	//GetMesh()->SetRenderCustomDepth(true);
 	//GetMesh()->SetCustomDepthStencilValue(16);
 }
@@ -92,6 +94,11 @@ void AMonster::OnDissolve()
 	{
 		mDissolveMtrlArray[i]->SetScalarParameterValue(TEXT("DissolveEnable"), 1.f);
 	}
+}
+
+void AMonster::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
 }
 
 // Called when the game starts or when spawned
@@ -143,6 +150,43 @@ void AMonster::BeginPlay()
 	UMonsterHPBase* HPWidget = Cast<UMonsterHPBase>(mWidgetComponent->GetWidget());
 	if (IsValid(HPWidget))
 		HPWidget->SetInitHP(1.f);
+
+	int32 SkillCount = mSkillNameArray.Num();
+
+	for (int32 i = 0; i < SkillCount; ++i)
+	{
+		const FSkillData* Data = GameInst->FindMonsterSkillTable(mSkillNameArray[i]);
+
+		FMonsterSkillInfo	SkillInfo;
+
+		SkillInfo.Type = Data->Type;
+		SkillInfo.System = Data->System;
+		SkillInfo.SkillName = Data->SkillName;
+		SkillInfo.Description = Data->Description;
+		SkillInfo.SkillOptionArray = Data->SkillOptionArray;
+		SkillInfo.SkillEffectArray = Data->SkillEffectArray;
+		SkillInfo.SkillUseDataArray = Data->SkillUseDataArray;
+
+		SkillInfo.UseSkill = false;
+		SkillInfo.UseMulti = false;
+
+		int32 UseCount = SkillInfo.SkillUseDataArray.Num();
+
+		for (int32 j = 0; j < UseCount; ++j)
+		{
+			if (SkillInfo.SkillUseDataArray[j].Type == ESkillUseType::Duration)
+			{
+				SkillInfo.UseMulti = true;
+				break;
+			}
+		}
+
+		SkillInfo.Duration = 0.f;
+		SkillInfo.Distance = Data->Distance;
+		SkillInfo.AnimType = Data->AnimType;
+
+		mSkillDataArray.Add(SkillInfo);
+	}
 }
 
 // Called every frame
@@ -159,11 +203,10 @@ void AMonster::Tick(float DeltaTime)
 			HPWidget->SetHP(mRatio);
 	}
 
-	// 현재 패트롤 상태일 경우 속도벡터를 이용하여 이동양을 구한다.
+	// 현재 패트롤 상태일 경우 속도벡터를 이용하여 이동량을 구한다.
 	if (mPatrolEnable)
 	{
-		// 현재 도착지점의 인덱스를 이용해서 그 값을 넘어갈 경우 해당 값으로
-		// 고정하여 거기까지만 이동할 수 있도록 한다.
+		// 현재 도착지점의 인덱스를 이용해서 그 값을 넘어갈 경우 해당 값으로 고정하여 거기까지만 이동할 수 있도록 한다.
 		mPatrolCurrentDistance += (GetCharacterMovement()->MaxWalkSpeed * DeltaTime * mPatrolIndexAdd);
 
 		if (GetArrive())
@@ -204,6 +247,9 @@ void AMonster::Tick(float DeltaTime)
 			Destroy();
 		}
 	}
+
+	if (!mSkillEnable)
+		UseSkill(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -213,12 +259,9 @@ void AMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-float AMonster::TakeDamage(float DamageAmount, 
-	FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	int32 Damage = (int32)Super::TakeDamage(DamageAmount, DamageEvent,
-		EventInstigator, DamageCauser);
+	int32 Damage = (int32)Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	Damage = Damage - mInfo.ArmorPoint;
 	Damage = Damage < 1 ? 1 : Damage;
@@ -290,4 +333,130 @@ void AMonster::ReStartAI()
 
 	PrintViewport(1.f, FColor::Red, TEXT("ReStart AI"));
 
+}
+
+void AMonster::UseSkill(float DeltaTime)
+{
+	// 전투상태인지 판단한다.
+
+	AMonsterAIController* AIController = Cast<AMonsterAIController>(GetController());
+	AActor* Target = Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
+
+	if (!Target)
+		return;
+
+	// 발밑 위치를 구한다.
+	float HalfHeight = 0.f;
+
+	if (Cast<ACharacter>(Target))
+		HalfHeight = Cast<ACharacter>(Target)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	FVector TargetLoc = Target->GetActorLocation();
+	TargetLoc.Z -= HalfHeight;
+	FVector Loc = GetActorLocation();
+	Loc.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	float Dist = (float)FVector::Distance(TargetLoc, Loc);
+
+	// 스킬을 사용해야 하는지 판단한다.
+	int SkillCount = mSkillDataArray.Num();
+
+	for (int32 i = 0; i < SkillCount; ++i)
+	{
+		// 스킬을 사용했는데 해당 스킬이 1번만 사용되고 더이상 사용 못할 경우
+		if (mSkillDataArray[i].UseSkill)
+		{
+			if (!mSkillDataArray[i].UseMulti)
+				continue;
+		}
+
+		// 사용된 스킬이 아니라면 현재 스킬
+		int32 UseDataCount = mSkillDataArray[i].SkillUseDataArray.Num();
+		bool Use = true;
+
+		for (int32 j = 0; j < UseDataCount; ++j)
+		{
+			switch (mSkillDataArray[i].SkillUseDataArray[j].Type)
+			{
+			case ESkillUseType::HPPercent:
+				// 체력 계산
+				if ((float)mInfo.HP / mInfo.HPMax > mSkillDataArray[i].SkillUseDataArray[j].Data)
+					Use = false;
+				break;
+			case ESkillUseType::Duration:
+				mSkillDataArray[i].Duration += DeltaTime;
+
+				if (mSkillDataArray[i].Duration < mSkillDataArray[i].SkillUseDataArray[j].Data)
+					Use = false;
+				break;
+			case ESkillUseType::Ratio:
+				if (FMath::RandRange(0.f, 1.f) > mSkillDataArray[i].SkillUseDataArray[j].Data)
+					Use = false;
+				break;
+			}
+
+			if (!Use)
+				break;
+		}
+
+		if (!mSkillEnable)
+		{
+			if (Dist > mSkillDataArray[i].Distance)
+				Use = false;
+			
+			// 모두 통과했으므로 스킬을 사용해야 한다.
+			if (Use)
+			{
+				mSkillDataArray[i].UseSkill = true;
+				mSkillEnable = true;
+				mUseSkillIndex = i;
+
+				AIController->GetBlackboardComponent()->SetValueAsBool(TEXT("SkillEnable"), true);
+			}
+		}
+	}
+}
+
+void AMonster::ClearSkill()
+{
+	mUseSkillIndex = -1;
+	mSkillEnable = false;
+
+	int32 SkillCount = mSkillDataArray.Num();
+
+	for (int32 i = 0; i < SkillCount; ++i)
+	{
+		mSkillDataArray[i].UseSkill = false;
+		mSkillDataArray[i].Duration = 0.f;
+	}
+
+	AMonsterAIController* AIController = Cast<AMonsterAIController>(GetController());
+	AIController->GetBlackboardComponent()->SetValueAsBool(TEXT("SkillEnable"), false);
+}
+
+void AMonster::ClearCurrentSkill()
+{
+	if (mUseSkillIndex == -1)
+		return;
+
+	mSkillDataArray[mUseSkillIndex].UseSkill = false;
+	mSkillDataArray[mUseSkillIndex].Duration = 0.f;
+
+	mUseSkillIndex = -1;
+	mSkillEnable = false;
+
+	AMonsterAIController* AIController = Cast<AMonsterAIController>(GetController());
+	AIController->GetBlackboardComponent()->SetValueAsBool(TEXT("SkillEnable"), false);
+}
+
+void AMonster::Skill1()
+{
+}
+
+void AMonster::Skill2()
+{
+}
+
+void AMonster::Skill3()
+{
 }

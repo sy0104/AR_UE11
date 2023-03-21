@@ -48,3 +48,37 @@ void UMonsterAnimInstance::AnimNotify_AttackEnd()
 	if (IsValid(Monster))
 		Monster->SetAttackEnd(true);
 }
+
+void UMonsterAnimInstance::AnimNotify_Skill1()
+{
+	AMonster* Monster = Cast<AMonster>(TryGetPawnOwner());
+
+	if (IsValid(Monster))
+		Monster->Skill1();
+}
+
+void UMonsterAnimInstance::AnimNotify_Skill2()
+{
+	AMonster* Monster = Cast<AMonster>(TryGetPawnOwner());
+
+	if (IsValid(Monster))
+		Monster->Skill2();
+
+}
+
+void UMonsterAnimInstance::AnimNotify_Skill3()
+{
+	AMonster* Monster = Cast<AMonster>(TryGetPawnOwner());
+
+	if (IsValid(Monster))
+		Monster->Skill3();
+
+}
+
+void UMonsterAnimInstance::AnimNotify_SkillEnd()
+{
+	AMonster* Monster = Cast<AMonster>(TryGetPawnOwner());
+
+	if (IsValid(Monster))
+		Monster->ClearCurrentSkill();
+}

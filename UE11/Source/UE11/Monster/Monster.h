@@ -87,9 +87,27 @@ protected:
 	bool				mSkillEnable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<FName>		mSkillNameArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<FMonsterSkillInfo>	mSkillDataArray;
 
+	int32		mUseSkillIndex;
+
 public:
+	int32 GetUseSkillIndex() const
+	{
+		return mUseSkillIndex;
+	}
+
+	const FMonsterSkillInfo* GetSkillData()
+	{
+		if (mUseSkillIndex == -1)
+			return nullptr;
+
+		return &mSkillDataArray[mUseSkillIndex];
+	}
+
 	bool GetArrive()	const
 	{
 		float	Dist = 10.f + GetCapsuleComponent()->GetScaledCapsuleRadius();
@@ -257,6 +275,10 @@ public:
 
 	void OnDissolve();
 
+public:
+	virtual void OnConstruction(const FTransform& Transform);
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -282,4 +304,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ReStartAI();
+
+private:
+	void UseSkill(float DeltaTime);
+
+public:
+	void ClearSkill();
+	void ClearCurrentSkill();
+	
+	virtual void Skill1();
+	virtual void Skill2();
+	virtual void Skill3();
 };

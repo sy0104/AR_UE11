@@ -31,8 +31,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UParticleSystemComponent* mParticle;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	//UNiagaraSystemComponent* mNiagara;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UNiagaraComponent*	mNiagara;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	USoundBase* mSound;
@@ -67,6 +67,8 @@ public:
 	void SetStaticMesh(const FString& Path);
 	void SetParticle(const FString& Path);
 	void SetSound(const FString& Path);
+	void SetNiagara(UNiagaraSystem* Niagara);
+	void SetNiagara(const FString& Path);
 	void SetBoxExtent(const FVector& Extent);
 	void SetCollisionProfile(const FName& Profile);
 	void SetDecalTemplate(class ADecal* Decal);

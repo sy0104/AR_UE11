@@ -17,12 +17,14 @@ ASkillActor::ASkillActor()
 	mSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	mStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	mParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle"));
+	mNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
 
 	mSound = nullptr;
 
 	mSkeletalMesh->SetupAttachment(mRoot);
 	mStaticMesh->SetupAttachment(mRoot);
 	mParticle->SetupAttachment(mRoot);
+	mNiagara->SetupAttachment(mRoot);
 
 	mRoot->bVisualizeComponent = true;
 
@@ -55,8 +57,7 @@ void ASkillActor::Tick(float DeltaTime)
 
 void ASkillActor::SetSkeletalMesh(const FString& Path)
 {
-	USkeletalMesh* SkeletalMesh = LoadObject<USkeletalMesh>(
-		nullptr, *Path);
+	USkeletalMesh* SkeletalMesh = LoadObject<USkeletalMesh>(nullptr, *Path);
 
 	if (IsValid(SkeletalMesh))
 		mSkeletalMesh->SetSkeletalMesh(SkeletalMesh);
@@ -64,8 +65,7 @@ void ASkillActor::SetSkeletalMesh(const FString& Path)
 
 void ASkillActor::SetStaticMesh(const FString& Path)
 {
-	UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(
-		nullptr, *Path);
+	UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(nullptr, *Path);
 
 	if (IsValid(StaticMesh))
 		mStaticMesh->SetStaticMesh(StaticMesh);
@@ -73,8 +73,7 @@ void ASkillActor::SetStaticMesh(const FString& Path)
 
 void ASkillActor::SetParticle(const FString& Path)
 {
-	UParticleSystem* Particle = LoadObject<UParticleSystem>(
-		nullptr, *Path);
+	UParticleSystem* Particle = LoadObject<UParticleSystem>(nullptr, *Path);
 
 	if (IsValid(Particle))
 		mParticle->SetTemplate(Particle);
@@ -83,6 +82,20 @@ void ASkillActor::SetParticle(const FString& Path)
 void ASkillActor::SetSound(const FString& Path)
 {
 	mSound = LoadObject<USoundBase>(nullptr, *Path);
+}
+
+void ASkillActor::SetNiagara(UNiagaraSystem* Niagara)
+{
+	if (IsValid(Niagara))
+		mNiagara->SetAsset(Niagara);
+}
+
+void ASkillActor::SetNiagara(const FString& Path)
+{
+	UNiagaraSystem* Niagara = LoadObject<UNiagaraSystem>(nullptr, *Path);
+
+	if (IsValid(Niagara))
+		mNiagara->SetAsset(Niagara);
 }
 
 void ASkillActor::SetBoxExtent(const FVector& Extent)
@@ -107,14 +120,9 @@ void ASkillActor::CreateDecal(const FHitResult& Hit)
 
 	FActorSpawnParameters	SpawnParam;
 	SpawnParam.Template = mDecal;
-	SpawnParam.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ADecal* Decal =
-		GetWorld()->SpawnActor<ADecal>(
-			GetActorLocation(),
-			GetActorRotation(),
-			SpawnParam);
+	ADecal* Decal = GetWorld()->SpawnActor<ADecal>(GetActorLocation(), GetActorRotation(), SpawnParam);
 
 	PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("LifeSpan : %.5f"), mDecalLifeSpan));
 	Decal->SetLifeSpan(mDecalLifeSpan);
@@ -131,11 +139,8 @@ void ASkillActor::CreateDecal(const FHitResult& Hit)
 
 		FHitResult	LineHit;
 		bool Collision = GetWorld()->LineTraceSingleByChannel(
-			LineHit,
-			GetActorLocation(),
-			GetActorLocation() + FVector::DownVector * 1000.f,
-			ECollisionChannel::ECC_Visibility,
-			param);
+			LineHit, GetActorLocation(), GetActorLocation() + FVector::DownVector * 1000.f,
+			ECollisionChannel::ECC_Visibility, param);
 
 		if (Collision)
 		{

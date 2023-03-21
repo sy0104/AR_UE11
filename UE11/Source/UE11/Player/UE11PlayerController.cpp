@@ -38,8 +38,7 @@ void AUE11PlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	FHitResult	result;
-	bool Hit = GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel8,
-		false, result);
+	bool Hit = GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel8, false, result);
 
 	if (Hit)
 	{
@@ -125,20 +124,16 @@ void AUE11PlayerController::SpawnMousePick()
 		return;
 
 	FActorSpawnParameters	SpawnParam;
-	SpawnParam.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ADecal* Decal =
 		GetWorld()->SpawnActor<ADecal>(
-			mMousePick->GetActorLocation(),
-			FRotator(0.f, mMousePick->GetActorRotation().Yaw, 0.f),
-			SpawnParam);
+			mMousePick->GetActorLocation(), FRotator(0.f, mMousePick->GetActorRotation().Yaw, 0.f), SpawnParam);
 
 	Decal->SetActorScale3D(FVector(0.5f, 0.5f, 0.5f));
 	Decal->SetDecalMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/MTMagicCircle_Inst.MTMagicCircle_Inst'"));
 	Decal->SetSpawnType(EDecalSpawnType::Floor);
 	Decal->SetLifeSpan(5.f);
 
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this,
-		mMousePick->GetActorLocation());
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, mMousePick->GetActorLocation());
 }

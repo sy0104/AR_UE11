@@ -6,28 +6,6 @@
 #include "Animation/AnimInstance.h"
 #include "MonsterAnimInstance.generated.h"
 
-UENUM(BlueprintType)
-enum class EMonsterAnimType : uint8
-{
-	Idle,
-	Run,
-	CombatRun,
-	Attack,
-	Death,
-	KnockBack,
-	Stun,
-	Skill1,
-	Skill2,
-	Skill3,
-	Skill4,
-	Skill5,
-	Skill6,
-	Skill7,
-	Skill8,
-	Skill9,
-	Skill10,
-};
-
 /**
  * 
  */
@@ -86,4 +64,16 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_AttackEnd();
+
+	UFUNCTION()
+	void AnimNotify_Skill1();
+
+	UFUNCTION()
+	void AnimNotify_Skill2();
+
+	UFUNCTION()
+	void AnimNotify_Skill3();
+
+	UFUNCTION()
+	void AnimNotify_SkillEnd();
 };

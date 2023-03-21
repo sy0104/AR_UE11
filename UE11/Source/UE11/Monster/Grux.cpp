@@ -3,27 +3,19 @@
 
 #include "Grux.h"
 #include "MonsterAIController.h"
-#include "../Particle/ParticleCascade.h"
+#include "../Particle/ParticleNiagara.h"
+#include "../UE11GameInstance.h"
+#include "../Skill/SkillProjectile.h"
 
 AGrux::AGrux()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	//static ConstructorHelpers::FObjectFinder<USkeletalMesh>	MeshAsset(TEXT("SkeletalMesh'/Game/ParagonMinions/Characters/Minions/Dusk_Minions/Meshes/Minion_Lane_Super_Dusk.Minion_Lane_Super_Dusk'"));
-
-	//if (MeshAsset.Succeeded())
-	//GetMesh()->SetSkeletalMesh(MeshAsset.Object);
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(120.f);
 	GetCapsuleComponent()->SetCapsuleRadius(60.f);
 
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -120.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
-
-	//static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimClass(TEXT("AnimBlueprint'/Game/Monster/Animation/ABMinionWarrior.ABMinionWarrior_C'"));
-
-	//if (AnimClass.Succeeded())
-	//	GetMesh()->SetAnimInstanceClass(AnimClass.Class);
 
 	mMonsterTableRowName = TEXT("Grux");
 
@@ -33,10 +25,19 @@ AGrux::AGrux()
 	Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
 	Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"), false);
 
-	FConvertMaterial	Mtrl;
+	FConvertMaterial Mtrl;
 	Mtrl.Index = 0;
 
 	mDissolveMtrlIndexArray.Add(Mtrl);
+
+	mSkillNameArray.Add(TEXT("GruxSkill1"));
+	mSkillNameArray.Add(TEXT("GruxSkill2"));
+	mSkillNameArray.Add(TEXT("GruxSkill3"));
+}
+
+void AGrux::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
 }
 
 void AGrux::BeginPlay()
@@ -65,7 +66,7 @@ void AGrux::Attack()
 
 	if (IsValid(Target))
 	{
-		FActorSpawnParameters	SpawnParam;
+		FActorSpawnParameters SpawnParam;
 		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		// 타겟과 몬스터 사이에 이펙트를 재생한다.
@@ -81,4 +82,95 @@ void AGrux::Attack()
 
 		Target->TakeDamage((float)mInfo.AttackPoint, FDamageEvent(), GetController(), this);
 	}
+}
+
+void AGrux::Skill1()
+{
+	AAIController* MonsterController = Cast<AAIController>(GetController());
+	ACharacter* Target = Cast<ACharacter>(MonsterController->GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
+
+	if (IsValid(Target))
+	{
+		FActorSpawnParameters	SpawnParam;
+		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		// 타겟과 몬스터 사이에 이펙트를 재생한다.
+		FVector	Dir = GetActorLocation() - Target->GetActorLocation();
+		Dir.Normalize();
+
+		FVector	ParticleLoc = Target->GetActorLocation() + Dir * 50.f;
+		AParticleNiagara* Particle = GetWorld()->SpawnActor<AParticleNiagara>(ParticleLoc, Dir.Rotation(), SpawnParam);
+
+		UNiagaraSystem* PlayEffect = nullptr;
+		UNiagaraSystem* TrailEffect = nullptr;
+
+		int32 EffectCount = mSkillDataArray[mUseSkillIndex].SkillEffectArray.Num();
+
+		for (int32 i = 0; i < EffectCount; ++i)
+		{
+			switch (mSkillDataArray[mUseSkillIndex].SkillEffectArray[i].Type)
+			{
+			case ESkillEffectType::Cast:
+				break;
+			case ESkillEffectType::Play:
+				PlayEffect = mSkillDataArray[mUseSkillIndex].SkillEffectArray[i].Effect;
+				break;
+			case ESkillEffectType::Trail:
+				break;
+			}
+		}
+
+		Particle->SetParticle(PlayEffect);
+		Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
+
+		float DmgRatio = 0.f;
+		int32 OptionCount = mSkillDataArray[mUseSkillIndex].SkillOptionArray.Num();
+
+		for (int32 i = 0; i < OptionCount; ++i)
+		{
+			if (mSkillDataArray[mUseSkillIndex].SkillOptionArray[i].Type == ESkillOptionType::Damage)
+				DmgRatio += mSkillDataArray[mUseSkillIndex].SkillOptionArray[i].Option;
+		}
+
+		DmgRatio = DmgRatio == 0.f ? 1.f : DmgRatio;
+
+		Target->TakeDamage((float)mInfo.AttackPoint * DmgRatio, FDamageEvent(), GetController(), this);
+	}
+}
+
+void AGrux::Skill2()
+{
+	FActorSpawnParameters SpawnParam;
+	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ASkillProjectile* Skill = 
+		GetWorld()->SpawnActor<ASkillProjectile>(GetActorLocation() + GetActorForwardVector() * 100.f,
+		GetActorRotation(), SpawnParam);
+
+	UNiagaraSystem* PlayEffect = nullptr;
+	UNiagaraSystem* TrailEffect = nullptr;
+
+	int32 EffectCount = mSkillDataArray[mUseSkillIndex].SkillEffectArray.Num();
+
+	for (int32 i = 0; i < EffectCount; ++i)
+	{
+		switch (mSkillDataArray[mUseSkillIndex].SkillEffectArray[i].Type)
+		{
+		case ESkillEffectType::Cast:
+			break;
+		case ESkillEffectType::Play:
+			PlayEffect = mSkillDataArray[mUseSkillIndex].SkillEffectArray[i].Effect;
+			break;
+		case ESkillEffectType::Trail:
+			break;
+		}
+
+	}
+
+	Skill->SetNiagara(PlayEffect);
+	Skill->SetCollisionProfile(TEXT("MonsterAttack"));
+}
+
+void AGrux::Skill3()
+{
 }
