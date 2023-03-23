@@ -50,13 +50,25 @@ void AUE11GameModeBase::BeginPlay()
 			mMainHUD->AddToViewport();
 			//mMainHUD->SetHP(0.33f);
 		}
-
 	}
 }
 
 void AUE11GameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
+
+	UUE11GameInstance* GameInst = GetWorld()->GetGameInstance<UUE11GameInstance>();
+
+	if (IsValid(GameInst))
+	{
+		int32	PlayerJobIndex = (int32)GameInst->GetSelectJob();
+
+		if (PlayerJobIndex == 0)
+			DefaultPawnClass = AKnightCharacter::StaticClass();
+
+		else
+			DefaultPawnClass = mPlayerClassArray[PlayerJobIndex - 1];
+	}
 }
 
 void AUE11GameModeBase::PostLogin(APlayerController* NewPlayer)

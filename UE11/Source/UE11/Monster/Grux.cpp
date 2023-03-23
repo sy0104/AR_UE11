@@ -144,8 +144,7 @@ void AGrux::Skill2()
 	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ASkillProjectile* Skill = 
-		GetWorld()->SpawnActor<ASkillProjectile>(GetActorLocation() + GetActorForwardVector() * 100.f,
-		GetActorRotation(), SpawnParam);
+		GetWorld()->SpawnActor<ASkillProjectile>(GetActorLocation() + GetActorForwardVector() * 100.f, GetActorRotation(), SpawnParam);
 
 	UNiagaraSystem* PlayEffect = nullptr;
 	UNiagaraSystem* TrailEffect = nullptr;
@@ -169,8 +168,40 @@ void AGrux::Skill2()
 
 	Skill->SetNiagara(PlayEffect);
 	Skill->SetCollisionProfile(TEXT("MonsterAttack"));
+	Skill->SetDistance(mSkillDataArray[mUseSkillIndex].Distance);
 }
 
 void AGrux::Skill3()
 {
+	AAIController* MonsterController = Cast<AAIController>(GetController());
+	ACharacter* Target = Cast<ACharacter>(MonsterController->GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
+
+	FActorSpawnParameters SpawnParam;
+	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AParticleNiagara* Skill =
+		GetWorld()->SpawnActor<AParticleNiagara>(Target->GetActorLocation(), GetActorRotation(), SpawnParam);
+
+	UNiagaraSystem* PlayEffect = nullptr;
+	UNiagaraSystem* TrailEffect = nullptr;
+
+	int32 EffectCount = mSkillDataArray[mUseSkillIndex].SkillEffectArray.Num();
+
+	for (int32 i = 0; i < EffectCount; ++i)
+	{
+		switch (mSkillDataArray[mUseSkillIndex].SkillEffectArray[i].Type)
+		{
+		case ESkillEffectType::Cast:
+			break;
+		case ESkillEffectType::Play:
+			PlayEffect = mSkillDataArray[mUseSkillIndex].SkillEffectArray[i].Effect;
+			break;
+		case ESkillEffectType::Trail:
+			break;
+		default:
+			break;
+		}
+	}
+	
+	Skill->SetParticle(PlayEffect);
 }

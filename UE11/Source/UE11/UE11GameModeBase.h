@@ -3,7 +3,9 @@
 #pragma once
 
 #include <Blueprint\UserWidget.h>
+
 #include "UMG\MainHUDBase.h"
+#include "Player/PlayerCharacter.h"
 
 #include "GameInfo.h"
 #include "GameFramework/GameModeBase.h"
@@ -23,6 +25,9 @@ public:
 private:
 	TSubclassOf<UUserWidget>	mMainHUDClass;
 	UMainHUDBase*				mMainHUD;		// UsetWidget으로 만들어진 진짜 객체를 가리키는 포인터
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TArray<TSubclassOf<APlayerCharacter>>	mPlayerClassArray;
 
 public:
 	virtual void BeginPlay()	override;

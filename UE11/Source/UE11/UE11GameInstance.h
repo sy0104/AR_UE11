@@ -25,6 +25,20 @@ private:
 
 	UDataTable*			mMonsterSkillInfoTable;
 
+	EPlayerJob			mSelectJob;
+
+public:
+	void SetSelectJob(EPlayerJob Job)
+	{
+		mSelectJob = Job;
+	}
+
+public:
+	EPlayerJob GetSelectJob() const
+	{
+		return mSelectJob;
+	}
+
 public:
 	virtual void Init();
 

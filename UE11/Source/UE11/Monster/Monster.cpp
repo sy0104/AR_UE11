@@ -338,7 +338,6 @@ void AMonster::ReStartAI()
 void AMonster::UseSkill(float DeltaTime)
 {
 	// 전투상태인지 판단한다.
-
 	AMonsterAIController* AIController = Cast<AMonsterAIController>(GetController());
 	AActor* Target = Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
 
@@ -357,6 +356,10 @@ void AMonster::UseSkill(float DeltaTime)
 	Loc.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
 	float Dist = (float)FVector::Distance(TargetLoc, Loc);
+
+	// 거리에서 캡슐 반경을 빼준다.
+	Dist -= GetCapsuleComponent()->GetScaledCapsuleRadius();
+	Dist -= Cast<ACharacter>(Target)->GetCapsuleComponent()->GetScaledCapsuleRadius();
 
 	// 스킬을 사용해야 하는지 판단한다.
 	int SkillCount = mSkillDataArray.Num();
