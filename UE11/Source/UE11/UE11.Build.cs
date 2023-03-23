@@ -21,6 +21,8 @@ public class UE11 : ModuleRules
 			, "MovieScene"
             , "LevelSequence"
             , "MediaAssets"
+            , "Networking"
+            , "Sockets"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

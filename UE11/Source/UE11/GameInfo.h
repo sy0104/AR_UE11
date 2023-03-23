@@ -19,9 +19,16 @@
 #include "MediaTexture.h"
 #include "MediaSoundComponent.h"
 #include "MediaSource.h"
+#include "Networking.h"
+#include "Sockets.h"
+#include "SocketSubsystem.h"
+#include "HAL/Runnable.h"
+#include "HAL/RunnableThread.h"
 
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"
+
+#define PACKET_SIZE 2048
 
 
 DECLARE_LOG_CATEGORY_EXTERN(UE11, Log, All);
