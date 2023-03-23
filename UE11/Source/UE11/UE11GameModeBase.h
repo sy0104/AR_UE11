@@ -29,8 +29,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<TSubclassOf<APlayerCharacter>>	mPlayerClassArray;
 
+	class UUE11SaveGame*	mSaveGame;
+
 public:
-	virtual void BeginPlay()	override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
 	virtual void PostLogin(APlayerController* NewPlayer);
 	virtual void Tick(float DeltaTime)	override;
@@ -40,4 +43,12 @@ public:
 	{
 		return mMainHUD;
 	}
+
+	class UUE11SaveGame* GetSaveGame()
+	{
+		return mSaveGame;
+	}
+
+private:
+	void SaveGame();
 };

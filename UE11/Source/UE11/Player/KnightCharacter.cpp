@@ -12,6 +12,7 @@
 #include "../Skill/Ghost.h"
 #include "../UE11GameModeBase.h"
 #include "../UMG/MainHUDBase.h"
+#include "../UE11SaveGame.h"
 
 AKnightCharacter::AKnightCharacter()
 {
@@ -75,18 +76,21 @@ void AKnightCharacter::BeginPlay()
 
 	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
 
-	State->mPlayerInfo.AttackPoint = 80;
-	State->mPlayerInfo.ArmorPoint = 60;
-	State->mPlayerInfo.HP = 1000;
-	State->mPlayerInfo.HPMax = 1000;
-	State->mPlayerInfo.MP = 100;
-	State->mPlayerInfo.MPMax = 100;
+	State->mPlayerInfo.Job = EPlayerJob::Knight;
+	State->mPlayerInfo.Name = TEXT("Knight");
 
-	State->mPlayerInfo.Level = 1;
-	State->mPlayerInfo.Gold = 10000;
-	State->mPlayerInfo.Exp = 0;
-	State->mPlayerInfo.MoveSpeed = 1000.f;
-	State->mPlayerInfo.AttackDistance = 200.f;
+	//State->mPlayerInfo.AttackPoint = 80;
+	//State->mPlayerInfo.ArmorPoint = 60;
+	//State->mPlayerInfo.HP = 1000;
+	//State->mPlayerInfo.HPMax = 1000;
+	//State->mPlayerInfo.MP = 100;
+	//State->mPlayerInfo.MPMax = 100;
+
+	//State->mPlayerInfo.Level = 1;
+	//State->mPlayerInfo.Gold = 10000;
+	//State->mPlayerInfo.Exp = 0;
+	//State->mPlayerInfo.MoveSpeed = 1000.f;
+	//State->mPlayerInfo.AttackDistance = 200.f;
 
 	FSkillInfo	SkillInfo;
 	SkillInfo.SlotNumber = 0;
@@ -94,8 +98,7 @@ void AKnightCharacter::BeginPlay()
 	SkillInfo.Damage = 300;
 
 
-	ASkillProjectile* SkillProjectile = NewObject<ASkillProjectile>(this,
-		ASkillProjectile::StaticClass());
+	ASkillProjectile* SkillProjectile = NewObject<ASkillProjectile>(this, ASkillProjectile::StaticClass());
 	SkillInfo.SkillActor = Cast<ASkillActor>(SkillProjectile);
 
 	SkillProjectile->SetStaticMesh(TEXT("StaticMesh'/Game/ParagonYin/FX/Meshes/Environment/Animals/SM_Bat.SM_Bat'"));
@@ -105,8 +108,7 @@ void AKnightCharacter::BeginPlay()
 
 	//SkillProjectile->AddSkillEndDelegate<AKnightCharacter>(this,
 	//	&AKnightCharacter::Skill1End);
-	SkillProjectile->mOnSkillEnd.AddDynamic(this,
-		&AKnightCharacter::Skill1End);
+	SkillProjectile->mOnSkillEnd.AddDynamic(this, &AKnightCharacter::Skill1End);
 
 	UProjectileMovementComponent* Projectile = SkillProjectile->GetProjectile();
 
@@ -125,17 +127,11 @@ void AKnightCharacter::BeginPlay()
 	mSkillInfoArray.Add(SkillInfo);
 
 	FActorSpawnParameters	SpawnParam;
-	SpawnParam.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	mWeapon = GetWorld()->SpawnActor<AWeaponActor>(
-		AWeaponActor::StaticClass(), SpawnParam);
-
+	mWeapon = GetWorld()->SpawnActor<AWeaponActor>(AWeaponActor::StaticClass(), SpawnParam);
 	mWeapon->SetMesh(TEXT("StaticMesh'/Game/Meshes/Axe1.Axe1'"));
-
-	mWeapon->AttachToComponent(GetMesh(),
-		FAttachmentTransformRules::KeepRelativeTransform,
-		TEXT("weapon_l_socket"));
+	mWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("weapon_l_socket"));
 }
 
 void AKnightCharacter::Tick(float DeltaTime)
@@ -156,10 +152,7 @@ void AKnightCharacter::Tick(float DeltaTime)
 			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 			AGhost* Ghost =
-				GetWorld()->SpawnActor<AGhost>(
-					GetMesh()->GetComponentLocation(),
-					GetMesh()->GetComponentRotation(),
-					SpawnParam);
+				GetWorld()->SpawnActor<AGhost>(GetMesh()->GetComponentLocation(), GetMesh()->GetComponentRotation(), SpawnParam);
 
 			Ghost->SetGhostType(EGhostType::Fade);
 			Ghost->SetMesh(mGhostMesh);
@@ -296,4 +289,9 @@ void AKnightCharacter::Skill1End(ASkillActor* SkillActor,
 	const FHitResult& Hit)
 {
 	SkillActor->Destroy();
+}
+
+void AKnightCharacter::SavePlayer()
+{
+	Super::SavePlayer();
 }

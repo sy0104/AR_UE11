@@ -40,8 +40,10 @@ public:
 
 	virtual void UseSkill(int32 SkillNumber);
 
-
 public:
 	UFUNCTION()
 	void Skill1End(class ASkillActor* SkillActor, const FHitResult& Hit);
+
+public:
+	virtual void SavePlayer();
 };

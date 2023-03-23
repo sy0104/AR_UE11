@@ -17,19 +17,20 @@ class UE11_API AUE11PlayerState : public APlayerState
 
 	friend class APlayerCharacter;
 	friend class AKnightCharacter;
+	friend class AUE11SaveGame;
 	
 public:
 	AUE11PlayerState();
 
 protected:
 	// Transient : 휘발성으로 저장 또는 로드가 안된다.
-	UPROPERTY(Transient)
+	UPROPERTY(VisibleAnywhere)
 	float	mCameraZoomMin;
 
-	UPROPERTY(Transient)
+	UPROPERTY(VisibleAnywhere)
 	float	mCameraZoomMax;
 
-	UPROPERTY(Transient)	
+	UPROPERTY(VisibleAnywhere)
 	FPlayerInfo	mPlayerInfo;
 
 public:
@@ -54,8 +55,7 @@ public:
 		mPlayerInfo.AttackDistance = Dist;
 	}
 
-
-
 public:
 	void InitPlayer();
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 };

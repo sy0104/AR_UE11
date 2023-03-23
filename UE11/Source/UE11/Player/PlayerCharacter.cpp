@@ -9,6 +9,9 @@
 #include "UE11PlayerController.h"
 #include "../Material/UE11PhysicalMaterial.h"
 #include "../Particle/ParticleCascade.h"
+#include "../UE11SaveGame.h"
+#include "../UE11GameModeBase.h"
+
 #include "../Manager/InventoryManager.h"
 
 // Sets default values
@@ -65,6 +68,84 @@ void APlayerCharacter::BeginPlay()
 
 	// 게임 시작 시 인벤토리를 꺼준다. 현재 월드도 전달해준다.
 	UInventoryManager::GetInstance(GetWorld())->ShowInventory(false);
+
+	UUE11SaveGame* LoadGame = Cast<UUE11SaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Save"), 0));
+
+	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
+
+	FString FullPath = FPaths::ProjectSavedDir() + TEXT("SaveGames/Save.txt");
+
+	TSharedPtr<FArchive> Reader = MakeShareable(IFileManager::Get().CreateFileReader(*FullPath));
+
+	if (Reader.IsValid())
+	{
+		*Reader.Get() << State->mPlayerInfo.Name;
+		*Reader.Get() << State->mPlayerInfo.Job;
+		*Reader.Get() << State->mPlayerInfo.AttackPoint;
+		*Reader.Get() << State->mPlayerInfo.ArmorPoint;
+		*Reader.Get() << State->mPlayerInfo.HP;
+		*Reader.Get() << State->mPlayerInfo.HPMax;
+		*Reader.Get() << State->mPlayerInfo.MP;
+		*Reader.Get() << State->mPlayerInfo.MPMax;
+		*Reader.Get() << State->mPlayerInfo.Level;
+		*Reader.Get() << State->mPlayerInfo.Exp;
+		*Reader.Get() << State->mPlayerInfo.Gold;
+		*Reader.Get() << State->mPlayerInfo.MoveSpeed;
+		*Reader.Get() << State->mPlayerInfo.AttackDistance;
+
+		*Reader.Get() << State->mCameraZoomMin;
+		*Reader.Get() << State->mCameraZoomMax;
+	}
+
+	else
+	{
+		// 이 정보는 직업별로 기본 정보가 다르기 때문에 직업별 초기 데이터를 데이터테이블로 생성하고 데이터 테이블로부터 읽어오게 한다.
+		State->mPlayerInfo.AttackPoint = 80;
+		State->mPlayerInfo.ArmorPoint = 60;
+		State->mPlayerInfo.HP = 1000;
+		State->mPlayerInfo.HPMax = 1000;
+		State->mPlayerInfo.MP = 100;
+		State->mPlayerInfo.MPMax = 100;
+
+		State->mPlayerInfo.Level = 1;
+		State->mPlayerInfo.Gold = 10000;
+		State->mPlayerInfo.Exp = 0;
+		State->mPlayerInfo.MoveSpeed = 1000.f;
+		State->mPlayerInfo.AttackDistance = 200.f;
+	}
+}
+
+void APlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	LOG(TEXT("EndPlay"));
+
+	switch (EndPlayReason)
+	{
+	case EEndPlayReason::Destroyed:
+		LOG(TEXT("Destroyed"));
+		break;
+	case EEndPlayReason::LevelTransition:
+		LOG(TEXT("Level Transition"));
+		break;
+	case EEndPlayReason::EndPlayInEditor:
+		LOG(TEXT("EndPlayInEditor"));
+		break;
+	case EEndPlayReason::RemovedFromWorld:
+		LOG(TEXT("RemovedFromWorld"));
+		break;
+	case EEndPlayReason::Quit:
+		LOG(TEXT("Quit"));
+		break;
+	}
+}
+
+void APlayerCharacter::UnPossessed()
+{
+	Super::UnPossessed();
+
+	LOG(TEXT("UnPossessed"));
 }
 
 // Called every frame
@@ -106,6 +187,16 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	PrintViewport(2.f, FColor::Red, FString::Printf(TEXT("Dmg : %.5f"), DamageAmount));
 
+	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
+
+	if (IsValid(State))
+	{
+		float Dmg = DamageAmount - State->mPlayerInfo.ArmorPoint;
+
+		Dmg = Dmg < 1.f ? 1.f : Dmg;
+
+		State->mPlayerInfo.HP -= (int32)Dmg;
+	}
 
 	return Damage;
 }
@@ -352,4 +443,17 @@ void APlayerCharacter::FootStep(bool Left)
 			}
 		}
 	}
+}
+
+void APlayerCharacter::SavePlayer()
+{
+	UUE11SaveGame* SaveGame = NewObject<UUE11SaveGame>();
+
+	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
+
+	SaveGame->mPlayerInfo = State->mPlayerInfo;
+	SaveGame->mCameraZoomMin = State->mCameraZoomMin;
+	SaveGame->mCameraZoomMax = State->mCameraZoomMax;
+
+	UGameplayStatics::SaveGameToSlot(SaveGame, TEXT("Save"), 0);
 }

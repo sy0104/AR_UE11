@@ -5,6 +5,7 @@
 #include "Player/KnightCharacter.h"
 #include "Player/UE11PlayerController.h"
 #include "Player/UE11PlayerState.h"
+#include "UE11SaveGame.h"
 
 /*
 언리얼 타입 이름
@@ -22,7 +23,6 @@ AUE11GameModeBase::AUE11GameModeBase()
 	// 이 객체는 클래스의 타입 정보를 담아두는 객체이다.
 	// 언리얼 클래스들은 내부에 static 멤버함수르 자신의 타입정보를 반환할 수 있는 함수를 가지고 있다.
 	// 타입::StaticClass() 함수를 이용하여 해당 타입의 타입 정보를 얻어올 수 있다.
-	DefaultPawnClass = AKnightCharacter::StaticClass();
 	PlayerControllerClass = AUE11PlayerController::StaticClass();
 	PlayerStateClass = AUE11PlayerState::StaticClass();
 
@@ -39,6 +39,8 @@ void AUE11GameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	mSaveGame = NewObject<UUE11SaveGame>();
+
 	// 위젯 블루프린트 UClass 정보를 이용해서 객체를 만들어낸다.
 	if (IsValid(mMainHUDClass))
 	{
@@ -50,6 +52,32 @@ void AUE11GameModeBase::BeginPlay()
 			mMainHUD->AddToViewport();
 			//mMainHUD->SetHP(0.33f);
 		}
+	}
+}
+
+void AUE11GameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	switch (EndPlayReason)
+	{
+	case EEndPlayReason::Destroyed:
+		LOG(TEXT("Destroyed"));
+		break;
+	case EEndPlayReason::LevelTransition:
+		LOG(TEXT("Level Transition"));
+		
+		SaveGame();
+		break;
+	case EEndPlayReason::EndPlayInEditor:
+		LOG(TEXT("EndPlayInEditor"));
+		break;
+	case EEndPlayReason::RemovedFromWorld:
+		LOG(TEXT("RemovedFromWorld"));
+		break;
+	case EEndPlayReason::Quit:
+		LOG(TEXT("Quit"));
+		break;
 	}
 }
 
@@ -86,4 +114,35 @@ void AUE11GameModeBase::PostLogin(APlayerController* NewPlayer)
 void AUE11GameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AUE11GameModeBase::SaveGame()
+{
+	FString FullPath = FPaths::ProjectSavedDir() + TEXT("SaveGames/Save.txt");
+	FArchive* Writer = IFileManager::Get().CreateFileWriter(*FullPath);
+
+	if (Writer)
+	{
+		*Writer << mSaveGame->mPlayerInfo.Name;
+		*Writer << mSaveGame->mPlayerInfo.Job;
+		*Writer << mSaveGame->mPlayerInfo.AttackPoint;
+		*Writer << mSaveGame->mPlayerInfo.ArmorPoint;
+		*Writer << mSaveGame->mPlayerInfo.HP;
+		*Writer << mSaveGame->mPlayerInfo.HPMax;
+		*Writer << mSaveGame->mPlayerInfo.MP;
+		*Writer << mSaveGame->mPlayerInfo.MPMax;
+		*Writer << mSaveGame->mPlayerInfo.Level;
+		*Writer << mSaveGame->mPlayerInfo.Exp;
+		*Writer << mSaveGame->mPlayerInfo.Gold;
+		*Writer << mSaveGame->mPlayerInfo.MoveSpeed;
+		*Writer << mSaveGame->mPlayerInfo.AttackDistance;
+
+		*Writer << mSaveGame->mCameraZoomMin;
+		*Writer << mSaveGame->mCameraZoomMax;
+
+		// 사용이 끝났다면 스트림을 닫아주고 제거해야 한다.
+		Writer->Close();
+
+		delete Writer;
+	}
 }

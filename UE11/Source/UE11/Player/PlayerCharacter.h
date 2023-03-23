@@ -36,8 +36,10 @@ protected:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
 public:	
+	virtual void UnPossessed();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -73,4 +75,7 @@ public:
 	virtual void UseSkill(int32 SkillNumber);
 
 	void FootStep(bool Left);
+
+public:
+	virtual void SavePlayer();
 };
