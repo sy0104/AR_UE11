@@ -13,7 +13,7 @@ UCLASS()
 class UE11_API ASelectPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 public:
 	ASelectPlayerController();
 

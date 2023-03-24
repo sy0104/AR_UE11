@@ -57,6 +57,10 @@ void AParticleBase::SetParticle(UParticleSystem* Particle)
 {
 }
 
+void AParticleBase::SetParticle(UNiagaraSystem* Particle)
+{
+}
+
 void AParticleBase::SetParticle(const FString& Path)
 {
 }

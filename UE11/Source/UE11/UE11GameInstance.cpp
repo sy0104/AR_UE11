@@ -2,51 +2,66 @@
 
 
 #include "UE11GameInstance.h"
-#include "Manager/InventoryManager.h"
+#include "Network/NetworkManager.h"
+
+#include "Manager/InventoryMgr.h"
 
 UUE11GameInstance::UUE11GameInstance()
 	: m_MonsterTable(nullptr)
-	, mItemTable(nullptr)
-	, mInven(nullptr)
-
+	, m_ItemTable(nullptr)
+	, m_Inven(nullptr)
+	, mSelectJob(EPlayerJob::None)
 {
-	// Monster Table
+	/*
+	DataTable은 애셋의 내용을 읽어와서 TMap으로 구성되는 자료구조에
+	내용을 저장해둔다.
+	TMap은 Key와 Value로 구성이 되는데 Key는 DataTable의 행이름이
+	키로 저장되며 Value는 해당 DataTable을 구성하는 구조체 타입의
+	포인터 타입으로 얻어올수 있게 구성된다.
+	예를 들어 아래 DataTable은 FMonsterTableInfo 구조체로
+	DataTable을 구성하였기 때문에 탐색을 통해 원하는 데이터를 찾을
+	경우 FMonsterTableInfo의 포인터 타입으로 얻어올 수 있게 된다.
+	Key는 탐색 용도로 사용이 된다.	
+	*/
 	static ConstructorHelpers::FObjectFinder<UDataTable>	MonsterTable(TEXT("DataTable'/Game/Monster/MonsterTable.MonsterTable'"));
 	if (MonsterTable.Succeeded())
 		m_MonsterTable = MonsterTable.Object;
 
-	// Item Table
-	static ConstructorHelpers::FObjectFinder<UDataTable>	ItemTable(TEXT("DataTable'/Game/Blueprints/UIClass/ItemDataTable.ItemDataTable'"));
+	static ConstructorHelpers::FObjectFinder<UDataTable>	ItemTable(TEXT("DataTable'/Game/Blueprints/JeeHun/ItemDataTable.ItemDataTable'"));
 	if (ItemTable.Succeeded())
 	{
-		mItemTable = ItemTable.Object;
-		UInventoryManager::GetInstance(this)->SetItemTable(mItemTable);
+		m_ItemTable = ItemTable.Object;
+		UInventoryMgr::GetInst(this)->SetItemTable(m_ItemTable);
 	}
 
-	// SKill Info Table
 	static ConstructorHelpers::FObjectFinder<UDataTable>	SkillfInfoTable(TEXT("DataTable'/Game/Skill/DTMonsterSkill.DTMonsterSkill'"));
 	if (SkillfInfoTable.Succeeded())
 	{
-		mMonsterSkillInfoTable = SkillfInfoTable.Object;
+		m_MonsterSkillInfoTable = SkillfInfoTable.Object;
 	}
 }
 
 UUE11GameInstance::~UUE11GameInstance()
 {
+	CNetworkManager::DestroyInst();
 }
 
 void UUE11GameInstance::Init()
 {
 	Super::Init();
+
+	CNetworkManager::GetInst()->Init();
 }
 
-const FMonsterTableInfo* UUE11GameInstance::FindMonsterTable(const FName& Name)
+const FMonsterTableInfo* UUE11GameInstance::FindMonsterTable(
+	const FName& Name)
 {
-	// 2번째 인자인 ContextString은 해당 키를 이용하여 탐색이 실패할 경우 출력할 메시지를 FString 타입으로 전달한다.
+	// 2번째 인자인 ContextString은 해당 키를 이용하여 탐색이
+	// 실패할 경우 출력할 메시지를 FString 타입으로 전달한다.
 	return m_MonsterTable->FindRow<FMonsterTableInfo>(Name, TEXT(""));
 }
 
 const FSkillData* UUE11GameInstance::FindMonsterSkillTable(const FName& Name)
 {
-	return mMonsterSkillInfoTable->FindRow<FSkillData>(Name, TEXT(""));
+	return m_MonsterSkillInfoTable->FindRow<FSkillData>(Name, TEXT(""));
 }

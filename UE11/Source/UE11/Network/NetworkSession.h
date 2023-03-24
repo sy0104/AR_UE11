@@ -14,10 +14,27 @@ public:
 	~CNetworkSession();
 
 private:
-	FSocket*	mSocket;
-	bool		mConnect;
-	uint8		mReceivePacket[PACKET_SIZE];
-	uint8		mSendPacket[PACKET_SIZE];
+	FString	mName;
+	FSocket* mSocket;
+	bool	mConnect;
+	uint8	mReceivePacket[PACKET_SIZE];
+	uint8	mSendPacket[PACKET_SIZE];
+
+public:
+	bool IsConnect()
+	{
+		return mConnect;
+	}
+
+	const FString& GetName()	const
+	{
+		return mName;
+	}
+
+	void SetName(const FString& Name)
+	{
+		mName = Name;
+	}
 
 public:
 	bool Connect(const FString& IPAddr, int32 Port);

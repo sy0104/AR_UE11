@@ -24,12 +24,13 @@ void AUE11PlayerController::BeginPlay()
 	FInputModeGameAndUI	Mode;
 	SetInputMode(Mode);
 
-	mMousePick = GetWorld()->SpawnActor<ADecal>(FVector::ZeroVector, FRotator::ZeroRotator);
+	mMousePick = GetWorld()->SpawnActor<ADecal>(FVector::ZeroVector,
+		FRotator::ZeroRotator);
 
 	mMousePick->SetDecalMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/MTMagicCircle_Inst.MTMagicCircle_Inst'"));
 	mMousePick->SetSpawnType(EDecalSpawnType::Floor);
 
-	// 마우스 위에 있는 액터를 인지하는 기능 On
+	// 마우스 위에 있는 액터를 인지하는 기능 온
 	bEnableMouseOverEvents = true;
 }
 
@@ -38,7 +39,8 @@ void AUE11PlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	FHitResult	result;
-	bool Hit = GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel8, false, result);
+	bool Hit = GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel8,
+		false, result);
 
 	if (Hit)
 	{
@@ -124,16 +126,20 @@ void AUE11PlayerController::SpawnMousePick()
 		return;
 
 	FActorSpawnParameters	SpawnParam;
-	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParam.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ADecal* Decal =
 		GetWorld()->SpawnActor<ADecal>(
-			mMousePick->GetActorLocation(), FRotator(0.f, mMousePick->GetActorRotation().Yaw, 0.f), SpawnParam);
+			mMousePick->GetActorLocation(),
+			FRotator(0.f, mMousePick->GetActorRotation().Yaw, 0.f),
+			SpawnParam);
 
 	Decal->SetActorScale3D(FVector(0.5f, 0.5f, 0.5f));
 	Decal->SetDecalMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/MTMagicCircle_Inst.MTMagicCircle_Inst'"));
 	Decal->SetSpawnType(EDecalSpawnType::Floor);
 	Decal->SetLifeSpan(5.f);
 
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, mMousePick->GetActorLocation());
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this,
+		mMousePick->GetActorLocation());
 }

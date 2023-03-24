@@ -76,6 +76,7 @@ public:
 
 	void FootStep(bool Left);
 
+
 public:
 	virtual void SavePlayer();
 };

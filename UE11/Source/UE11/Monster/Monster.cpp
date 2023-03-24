@@ -10,14 +10,14 @@
 
 // Sets default values
 AMonster::AMonster()
-	: mRatio(1.f)
+	: m_Ratio(1.f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 몬스터의 HP UI를 표현해 줄 WidgetComponent를 추가한다.
-	mWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetCom"));
-	mWidgetComponent->SetupAttachment(GetMesh());
+	// 몬스터의 HP UI 를 표현해 줄 WidgetComponent 를 추가한다.
+	mWidgetComopnent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetCom"));
+	mWidgetComopnent->SetupAttachment(GetMesh());
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -49,7 +49,8 @@ AMonster::AMonster()
 
 	mSkillEnable = false;
 
-	mUseSkillIndex = -1;	// -1은 사용하는 스킬이 없다는 의미이다.
+	// -1은 사용하는 스킬이 없다는 의미이다.
+	mUseSkillIndex = -1;
 
 	//GetMesh()->SetRenderCustomDepth(true);
 	//GetMesh()->SetCustomDepthStencilValue(16);
@@ -106,8 +107,11 @@ void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UUE11GameInstance* GameInst = GetWorld()->GetGameInstance<UUE11GameInstance>();
-	const FMonsterTableInfo* Info = GameInst->FindMonsterTable(mMonsterTableRowName);
+	UUE11GameInstance* GameInst = 
+		GetWorld()->GetGameInstance<UUE11GameInstance>();
+
+	const FMonsterTableInfo* Info = 
+		GameInst->FindMonsterTable(mMonsterTableRowName);
 
 	if (Info)
 	{
@@ -131,6 +135,7 @@ void AMonster::BeginPlay()
 		GetCharacterMovement()->MaxWalkSpeedCrouched = mInfo.MoveSpeed * 0.5f;
 
 		GetMesh()->SetSkeletalMesh(Info->Mesh);
+
 		GetMesh()->SetAnimInstanceClass(Info->MonsterAnimClass);
 
 		int32	IndexCount = mDissolveMtrlIndexArray.Num();
@@ -138,7 +143,8 @@ void AMonster::BeginPlay()
 		for (int32 i = 0; i < IndexCount; ++i)
 		{
 			UMaterialInstanceDynamic* Mtrl = 
-				GetMesh()->CreateDynamicMaterialInstance(mDissolveMtrlIndexArray[i].Index, mDissolveMtrlIndexArray[i].Mtrl);
+				GetMesh()->CreateDynamicMaterialInstance(mDissolveMtrlIndexArray[i].Index,
+					mDissolveMtrlIndexArray[i].Mtrl);
 
 			mDissolveMtrlArray.Add(Mtrl);
 		}
@@ -146,16 +152,20 @@ void AMonster::BeginPlay()
 	
 	mAnimInst = Cast<UMonsterAnimInstance>(GetMesh()->GetAnimInstance());
 
-	// 위젯 컴포넌트가 지정한 MonsterHPBase 위젯에 프로그레스 바를 조정한다.
-	UMonsterHPBase* HPWidget = Cast<UMonsterHPBase>(mWidgetComponent->GetWidget());
+
+	// 위젯컴포넌트가 지정한 MonsterHPBase 위젯에 프로그레스바를 조정한다.
+	UMonsterHPBase* HPWidget = Cast<UMonsterHPBase>(mWidgetComopnent->GetWidget());
 	if (IsValid(HPWidget))
+	{
 		HPWidget->SetInitHP(1.f);
+	}
 
 	int32 SkillCount = mSkillNameArray.Num();
 
 	for (int32 i = 0; i < SkillCount; ++i)
 	{
-		const FSkillData* Data = GameInst->FindMonsterSkillTable(mSkillNameArray[i]);
+		const FSkillData* Data =
+			GameInst->FindMonsterSkillTable(mSkillNameArray[i]);
 
 		FMonsterSkillInfo	SkillInfo;
 
@@ -194,20 +204,21 @@ void AMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 몬스터 HPBar 테스트
-	{
-		UMonsterHPBase* HPWidget = Cast<UMonsterHPBase>(mWidgetComponent->GetWidget());
-		mRatio -= DeltaTime * 0.05f;
+	UMonsterHPBase* HPWidget = Cast<UMonsterHPBase>(mWidgetComopnent->GetWidget());	
+	m_Ratio -= DeltaTime * 0.05f;
 
-		if (IsValid(HPWidget))
-			HPWidget->SetHP(mRatio);
+	if (IsValid(HPWidget))
+	{
+		HPWidget->SetHP(m_Ratio);
 	}
 
-	// 현재 패트롤 상태일 경우 속도벡터를 이용하여 이동량을 구한다.
+	// 현재 패트롤 상태일 경우 속도벡터를 이용하여 이동양을 구한다.
 	if (mPatrolEnable)
 	{
-		// 현재 도착지점의 인덱스를 이용해서 그 값을 넘어갈 경우 해당 값으로 고정하여 거기까지만 이동할 수 있도록 한다.
-		mPatrolCurrentDistance += (GetCharacterMovement()->MaxWalkSpeed * DeltaTime * mPatrolIndexAdd);
+		// 현재 도착지점의 인덱스를 이용해서 그 값을 넘어갈 경우 해당 값으로
+		// 고정하여 거기까지만 이동할 수 있도록 한다.
+		mPatrolCurrentDistance += (GetCharacterMovement()->MaxWalkSpeed *
+			DeltaTime * mPatrolIndexAdd);
 
 		if (GetArrive())
 		{
@@ -259,11 +270,15 @@ void AMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-float AMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float AMonster::TakeDamage(float DamageAmount, 
+	FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
 {
-	int32 Damage = (int32)Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	int32 Damage = (int32)Super::TakeDamage(DamageAmount, DamageEvent,
+		EventInstigator, DamageCauser);
 
 	Damage = Damage - mInfo.ArmorPoint;
+
 	Damage = Damage < 1 ? 1 : Damage;
 
 	mInfo.HP -= Damage;
@@ -295,8 +310,10 @@ void AMonster::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와 Blackboard를 지정해준다.
-	AMonsterAIController* AI = Cast<AMonsterAIController>(NewController);
+	// 부모 기능을 실행하기 전에 먼저 BehaviorTree와
+	// Blackboard를 지정해준다.
+	AMonsterAIController* AI =
+		Cast<AMonsterAIController>(NewController);
 
 	if (IsValid(AI))
 	{
@@ -333,36 +350,37 @@ void AMonster::ReStartAI()
 
 	PrintViewport(1.f, FColor::Red, TEXT("ReStart AI"));
 
+	//mAnimInst = Cast<UMonsterAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void AMonster::UseSkill(float DeltaTime)
 {
 	// 전투상태인지 판단한다.
-	AMonsterAIController* AIController = Cast<AMonsterAIController>(GetController());
+	AMonsterAIController* AIController =
+		Cast<AMonsterAIController>(GetController());
+
 	AActor* Target = Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
 
 	if (!Target)
 		return;
 
-	// 발밑 위치를 구한다.
-	float HalfHeight = 0.f;
-
+	float	HalfHeight = 0.f;
+	
 	if (Cast<ACharacter>(Target))
 		HalfHeight = Cast<ACharacter>(Target)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
-	FVector TargetLoc = Target->GetActorLocation();
+	FVector	TargetLoc = Target->GetActorLocation();
 	TargetLoc.Z -= HalfHeight;
-	FVector Loc = GetActorLocation();
+	FVector	Loc = GetActorLocation();
 	Loc.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
-	float Dist = (float)FVector::Distance(TargetLoc, Loc);
+	float	Dist = (float)FVector::Distance(TargetLoc, Loc);
 
-	// 거리에서 캡슐 반경을 빼준다.
 	Dist -= GetCapsuleComponent()->GetScaledCapsuleRadius();
 	Dist -= Cast<ACharacter>(Target)->GetCapsuleComponent()->GetScaledCapsuleRadius();
 
 	// 스킬을 사용해야 하는지 판단한다.
-	int SkillCount = mSkillDataArray.Num();
+	int32	SkillCount = mSkillDataArray.Num();
 
 	for (int32 i = 0; i < SkillCount; ++i)
 	{
@@ -370,30 +388,42 @@ void AMonster::UseSkill(float DeltaTime)
 		if (mSkillDataArray[i].UseSkill)
 		{
 			if (!mSkillDataArray[i].UseMulti)
+			{
 				continue;
+			}
 		}
 
 		// 사용된 스킬이 아니라면 현재 스킬
 		int32 UseDataCount = mSkillDataArray[i].SkillUseDataArray.Num();
-		bool Use = true;
+
+		bool	Use = true;
 
 		for (int32 j = 0; j < UseDataCount; ++j)
 		{
 			switch (mSkillDataArray[i].SkillUseDataArray[j].Type)
 			{
 			case ESkillUseType::HPPercent:
-				// 체력 계산
-				if ((float)mInfo.HP / mInfo.HPMax > mSkillDataArray[i].SkillUseDataArray[j].Data)
+				// 체력계산.
+				if ((float)mInfo.HP / mInfo.HPMax >
+					mSkillDataArray[i].SkillUseDataArray[j].Data)
+				{
 					Use = false;
+				}
 				break;
 			case ESkillUseType::Duration:
 				mSkillDataArray[i].Duration += DeltaTime;
 
-				if (mSkillDataArray[i].Duration < mSkillDataArray[i].SkillUseDataArray[j].Data)
+				if (mSkillDataArray[i].Duration <
+					mSkillDataArray[i].SkillUseDataArray[j].Data)
+				{
 					Use = false;
+				}
 				break;
 			case ESkillUseType::Ratio:
-				if (FMath::RandRange(0.f, 1.f) > mSkillDataArray[i].SkillUseDataArray[j].Data)
+				float Percent;
+				Percent = FMath::FRand();
+
+				if (Percent > mSkillDataArray[i].SkillUseDataArray[j].Data)
 					Use = false;
 				break;
 			}
@@ -406,7 +436,7 @@ void AMonster::UseSkill(float DeltaTime)
 		{
 			if (Dist > mSkillDataArray[i].Distance)
 				Use = false;
-			
+
 			// 모두 통과했으므로 스킬을 사용해야 한다.
 			if (Use)
 			{
@@ -425,7 +455,7 @@ void AMonster::ClearSkill()
 	mUseSkillIndex = -1;
 	mSkillEnable = false;
 
-	int32 SkillCount = mSkillDataArray.Num();
+	int32	SkillCount = mSkillDataArray.Num();
 
 	for (int32 i = 0; i < SkillCount; ++i)
 	{
@@ -433,7 +463,9 @@ void AMonster::ClearSkill()
 		mSkillDataArray[i].Duration = 0.f;
 	}
 
-	AMonsterAIController* AIController = Cast<AMonsterAIController>(GetController());
+	AMonsterAIController* AIController =
+		Cast<AMonsterAIController>(GetController());
+
 	AIController->GetBlackboardComponent()->SetValueAsBool(TEXT("SkillEnable"), false);
 }
 
@@ -448,7 +480,9 @@ void AMonster::ClearCurrentSkill()
 	mUseSkillIndex = -1;
 	mSkillEnable = false;
 
-	AMonsterAIController* AIController = Cast<AMonsterAIController>(GetController());
+	AMonsterAIController* AIController =
+		Cast<AMonsterAIController>(GetController());
+
 	AIController->GetBlackboardComponent()->SetValueAsBool(TEXT("SkillEnable"), false);
 }
 

@@ -12,7 +12,7 @@
 #include "../UE11SaveGame.h"
 #include "../UE11GameModeBase.h"
 
-#include "../Manager/InventoryManager.h"
+#include "../Manager/InventoryMgr.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -66,16 +66,16 @@ void APlayerCharacter::BeginPlay()
 
 	mAnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
-	// 게임 시작 시 인벤토리를 꺼준다. 현재 월드도 전달해준다.
-	UInventoryManager::GetInstance(GetWorld())->ShowInventory(false);
+	// 게임 시작 시, 인벤토리를 꺼준다 (겸사겸사 현재 월드를 전달)
+	UInventoryMgr::GetInst(GetWorld())->ShowInventory(false);
 
-	UUE11SaveGame* LoadGame = Cast<UUE11SaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Save"), 0));
+	//UUE11SaveGame* LoadGame = Cast<UUE11SaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Save"), 0));
 
 	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
 
 	FString FullPath = FPaths::ProjectSavedDir() + TEXT("SaveGames/Save.txt");
 
-	TSharedPtr<FArchive> Reader = MakeShareable(IFileManager::Get().CreateFileReader(*FullPath));
+	TSharedPtr<FArchive>	Reader = MakeShareable(IFileManager::Get().CreateFileReader(*FullPath));
 
 	if (Reader.IsValid())
 	{
@@ -95,11 +95,18 @@ void APlayerCharacter::BeginPlay()
 
 		*Reader.Get() << State->mCameraZoomMin;
 		*Reader.Get() << State->mCameraZoomMax;
+
+		/*State->mPlayerInfo = LoadGame->mPlayerInfo;
+		State->mCameraZoomMin = LoadGame->mCameraZoomMin;
+		State->mCameraZoomMax = LoadGame->mCameraZoomMax;*/
 	}
 
 	else
 	{
-		// 이 정보는 직업별로 기본 정보가 다르기 때문에 직업별 초기 데이터를 데이터테이블로 생성하고 데이터 테이블로부터 읽어오게 한다.
+		// 이 정보는 직업별로 기본 정보가 다르기 때문에 직업별 초기 데이터를 데이터테이블로 생성하고
+		// 데이터 테이블로부터 읽어오게 한다.
+		// 여기 부분은 직접 제작해보세요.
+		//State->mPlayerInfo.Job = mSelectJob;
 		State->mPlayerInfo.AttackPoint = 80;
 		State->mPlayerInfo.ArmorPoint = 60;
 		State->mPlayerInfo.HP = 1000;
@@ -118,6 +125,8 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+	//SavePlayer();
 
 	LOG(TEXT("EndPlay"));
 
@@ -146,6 +155,8 @@ void APlayerCharacter::UnPossessed()
 	Super::UnPossessed();
 
 	LOG(TEXT("UnPossessed"));
+
+	
 }
 
 // Called every frame
@@ -159,31 +170,65 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// 바인드 매핑
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("MoveFront"), this, &APlayerCharacter::MoveFront);
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("MoveSide"), this, &APlayerCharacter::MoveSide);
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("RotationCameraZ"), this, &APlayerCharacter::RotationCameraZ);
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("RotationCameraY"), this, &APlayerCharacter::RotationCameraY);
-	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("CameraZoom"), this, &APlayerCharacter::CameraZoom);
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("MoveFront"),
+		this, &APlayerCharacter::MoveFront);
 
-	// 액션 매핑
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("NormalAttack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::NormalAttack);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Jump"), EInputEvent::IE_Pressed, this, &APlayerCharacter::JumpKey);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Skill1"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill1Key);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("DetachWeapon"), EInputEvent::IE_Pressed, this, &APlayerCharacter::WeaponDetach);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("MouseMove"), EInputEvent::IE_Pressed, this, &APlayerCharacter::MouseMove);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Skill2"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill2Key);
-	PlayerInputComponent->BindAction<APlayerCharacter>(TEXT("Skill2"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill2Key);
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("MoveSide"),
+		this, &APlayerCharacter::MoveSide);
+
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("RotationCameraZ"),
+		this, &APlayerCharacter::RotationCameraZ);
+
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("RotationCameraY"),
+		this, &APlayerCharacter::RotationCameraY);
+
+	PlayerInputComponent->BindAxis<APlayerCharacter>(TEXT("CameraZoom"),
+		this, &APlayerCharacter::CameraZoom);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("NormalAttack"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::NormalAttack);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("Jump"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::JumpKey);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("Skill1"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::Skill1Key);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("DetachWeapon"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::WeaponDetach);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("MouseMove"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::MouseMove);
+
+	PlayerInputComponent->BindAction<APlayerCharacter>(
+		TEXT("Skill2"),
+		EInputEvent::IE_Pressed, this,
+		&APlayerCharacter::Skill2Key);
 
 	FInputActionBinding& toggle = PlayerInputComponent->BindAction<APlayerCharacter>(
-		TEXT("Inventory"), EInputEvent::IE_Pressed, this, &APlayerCharacter::InventoryOn);
-
+										TEXT("Inventory"),
+										EInputEvent::IE_Pressed, this,
+										&APlayerCharacter::InventoryOn);
 	toggle.bConsumeInput = false;
 }
 
-float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float APlayerCharacter::TakeDamage(float DamageAmount, 
+	FDamageEvent const& DamageEvent, AController* EventInstigator, 
+	AActor* DamageCauser)
 {
-	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent,
+		EventInstigator, DamageCauser);
+
 
 	PrintViewport(2.f, FColor::Red, FString::Printf(TEXT("Dmg : %.5f"), DamageAmount));
 
@@ -211,7 +256,8 @@ void APlayerCharacter::MoveFront(float Scale)
 	if (Scale == 0.f)
 		return;
 
-	// AddMovementInput : 캐릭터 클래스에서 캐릭터 무브먼트 컴포넌트를 이용하여 이동하는 기능을 만들어놓은 함수이다.
+	// AddMovementInput : 캐릭터 클래스에서 캐릭터 무브먼트 컴포넌트를
+	// 이용하여 이동하는 기능을 만들어놓은 함수이다.
 	// GetActorForwardVector() : 이 액터의 전방 방향벡터를 얻어온다.
 	AddMovementInput(GetActorForwardVector(), Scale);
 }
@@ -269,7 +315,8 @@ void APlayerCharacter::MoveSide(float Scale)
 	if (Scale == 0.f)
 		return;
 
-	// AddMovementInput : 캐릭터 클래스에서 캐릭터 무브먼트 컴포넌트를 이용하여 이동하는 기능을 만들어놓은 함수이다.
+	// AddMovementInput : 캐릭터 클래스에서 캐릭터 무브먼트 컴포넌트를
+	// 이용하여 이동하는 기능을 만들어놓은 함수이다.
 	// GetActorRightVector() : 이 액터의 오른쪽 방향벡터를 얻어온다.
 	AddMovementInput(GetActorRightVector(), Scale);
 }
@@ -303,7 +350,8 @@ void APlayerCharacter::CameraZoom(float Scale)
 
 	mSpringArm->TargetArmLength += Scale * -5.f;
 
-	// Cast : 해당 타입일 경우 해당 메모리 주소를 형변환하여 반환하고 아닐 경우 nullptr을 반환한다.
+	// Cast : 해당 타입일 경우 해당 메모리 주소를 형변환하여 반환하고
+	// 아닐 경우 nullptr을 반환한다.
 	AUE11PlayerState* State = Cast<AUE11PlayerState>(GetPlayerState());
 
 	float	CameraZoomMin = 100.f, CameraZoomMax = 500.f;
@@ -375,8 +423,8 @@ void APlayerCharacter::Skill2Key()
 
 void APlayerCharacter::InventoryOn()
 {
-	// InventoryManager에 접근, 인벤토리가 꺼져있으면 켜준다.
-	UInventoryManager::GetInstance(GetWorld())->ShowInventory(true);
+	// InventoryMgr 에 접근  인벤토리가 꺼져있으면, 켜기		
+	UInventoryMgr::GetInst(GetWorld())->ShowInventory(true);
 }
 
 void APlayerCharacter::NormalAttackCheck()
@@ -413,7 +461,9 @@ void APlayerCharacter::FootStep(bool Left)
 	param.bReturnPhysicalMaterial = true;
 
 	FHitResult	result;
-	bool Hit = GetWorld()->LineTraceSingleByChannel(result, LineStart, LineEnd, ECollisionChannel::ECC_GameTraceChannel9, param);
+	bool Hit = GetWorld()->LineTraceSingleByChannel(result,
+		LineStart, LineEnd, ECollisionChannel::ECC_GameTraceChannel9,
+		param);
 
 	if (Hit)
 	{
@@ -427,10 +477,13 @@ void APlayerCharacter::FootStep(bool Left)
 			{
 				FActorSpawnParameters	SpawnParam;
 
-				SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				SpawnParam.SpawnCollisionHandlingOverride =
+					ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 				AParticleCascade* Particle =
-					GetWorld()->SpawnActor<AParticleCascade>(result.ImpactPoint, result.ImpactNormal.Rotation(), SpawnParam);
+					GetWorld()->SpawnActor<AParticleCascade>(
+						result.ImpactPoint, 
+						result.ImpactNormal.Rotation(), SpawnParam);
 
 				Particle->SetParticle(Phys->GetParticle());
 				Particle->SetSound(Phys->GetSound());
@@ -454,6 +507,6 @@ void APlayerCharacter::SavePlayer()
 	SaveGame->mPlayerInfo = State->mPlayerInfo;
 	SaveGame->mCameraZoomMin = State->mCameraZoomMin;
 	SaveGame->mCameraZoomMax = State->mCameraZoomMax;
-
+	
 	UGameplayStatics::SaveGameToSlot(SaveGame, TEXT("Save"), 0);
 }

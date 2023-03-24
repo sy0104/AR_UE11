@@ -7,7 +7,7 @@
 #include "PlayerInfoBase.h"
 #include "InventoryBase.h"
 
-#include "../GameInfo.h"
+#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "MainHUDBase.generated.h"
 
@@ -18,22 +18,19 @@ UCLASS()
 class UE11_API UMainHUDBase : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
 private:
-	UPlayerInfoBase*	mPlayerInfo;	// MainHUD에서 PlayerInfo에 빠르기 접근하기 위한 포인터 변수
-	UInventoryBase*		mInventory;
+	UPlayerInfoBase*	m_PlayerInfo;
+	UInventoryBase*		m_Inventory;
+
 
 public:
-	// Ratio: 0.f ~ 1.f
-	void SetHP(float Ratio);
+	// _Ratio 0.f ~ 1.f
+	void SetHP(float _Ratio);
 
 public:
-	virtual void NativeConstruct() override;										// BeginPlay() 역할
-	virtual void NativeTick(const FGeometry& _geo, float _DeltaTime) override;		// Tick() 역할
+	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& _geo, float _DeltaTime) override;
 
-public:
-	UInventoryBase* GetInventoryWidget()
-	{
-		return mInventory;
-	}
+	UInventoryBase* GetInventoryWidget() { return m_Inventory; }
 };

@@ -4,25 +4,25 @@
 
 #include <Blueprint\UserWidget.h>
 
-#include "GameInfo.h"
+#include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "StartGameModeBase.generated.h"
 
-
+/**
+ * 
+ */
 UCLASS()
 class UE11_API AStartGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+private:
+	TSubclassOf<UUserWidget>	m_StartHUDClass;
+	UUserWidget*				m_StartHUD;
+
 public:
 	AStartGameModeBase();
 
-private:
-	TSubclassOf<UUserWidget>	mStartHUDClass;
-	UUserWidget*				mStartHUD;
-
 public:
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
-
+	virtual void BeginPlay()	override;
+	virtual void Tick(float DeltaTime)	override;
 };

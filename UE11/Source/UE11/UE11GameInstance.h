@@ -2,13 +2,13 @@
 
 #pragma once
 
+class UInventoryMgr;
+
 #include "GameInfo.h"
 #include "Engine/GameInstance.h"
 #include "UE11GameInstance.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class UE11_API UUE11GameInstance : public UGameInstance
 {
@@ -19,13 +19,13 @@ public:
 	~UUE11GameInstance();
 
 private:
-	UDataTable*			m_MonsterTable;
-	UDataTable*			mItemTable;
-	UInventoryManager*	mInven;
+	UDataTable*		m_MonsterTable;
+	UDataTable*		m_ItemTable;
+	UInventoryMgr*	m_Inven;
 
-	UDataTable*			mMonsterSkillInfoTable;
+	UDataTable* m_MonsterSkillInfoTable;
 
-	EPlayerJob			mSelectJob;
+	EPlayerJob	mSelectJob;
 
 public:
 	void SetSelectJob(EPlayerJob Job)
@@ -33,8 +33,7 @@ public:
 		mSelectJob = Job;
 	}
 
-public:
-	EPlayerJob GetSelectJob() const
+	EPlayerJob GetSelectJob()	const
 	{
 		return mSelectJob;
 	}
@@ -46,5 +45,5 @@ public:
 	const FMonsterTableInfo* FindMonsterTable(const FName& Name);
 	const FSkillData* FindMonsterSkillTable(const FName& Name);
 
-	friend class UInventoryManager;
+	friend class UInventoryMgr;
 };

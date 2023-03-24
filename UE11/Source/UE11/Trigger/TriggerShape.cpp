@@ -9,21 +9,23 @@ ATriggerShape::ATriggerShape()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 일반 씬 컴포넌트로 루트를 잡아놓고 차일드로 충돌체 컴포넌트를 잡아놓는 식으로 설계한다.
 	mRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+
 	SetRootComponent(mRoot);
+
 	mRoot->bVisualizeComponent = true;
 
 	mShape = ETriggerShape::Box;
-	
-	//mBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
-	//mBox->SetupAttachment(mRoot);
-	//mBox->SetCollisionProfileName(TEXT("PlayerTrigger"));
+
+	/*mBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+
+	mBox->SetupAttachment(mRoot);
+
+	mBox->SetCollisionProfileName(TEXT("PlayerTrigger"));*/
 }
 
 void ATriggerShape::ChangeShape(ETriggerShape Shape)
 {
-	// 현재 모양과 바꿀 모양이 같다면 모양을 바꿔줄 필요가 없다
 	if (mShape == Shape)
 		return;
 
@@ -54,7 +56,7 @@ void ATriggerShape::ChangeShape(ETriggerShape Shape)
 		mBox = NewObject<UBoxComponent>(this, UBoxComponent::StaticClass(), TEXT("Box"));
 		mBox->RegisterComponent();
 		mBox->AttachToComponent(mRoot, FAttachmentTransformRules::KeepRelativeTransform);
-
+		
 		mBox->OnComponentBeginOverlap.AddDynamic(this, &ATriggerShape::BeginOverlap);
 		mBox->OnComponentEndOverlap.AddDynamic(this, &ATriggerShape::EndOverlap);
 		break;
@@ -102,27 +104,27 @@ void ATriggerShape::EnableCollision(bool Enable)
 	case ETriggerShape::Box:
 		if (!Enable)
 			mBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 		else
 			mBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	case ETriggerShape::Sphere:
 		if (!Enable)
 			mSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 		else
 			mSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	case ETriggerShape::Capsule:
 		if (!Enable)
 			mCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 		else
 			mCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	}
 }
 
-// 블루프린트의 Construction과 같은 역할을 한다.
-// 에디터에서 바뀌자마자 호출된다. (위치를 바꿀때도 호출된다)
-// 실시간으로 갱신되어야 할 때 사용한다.
 void ATriggerShape::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
@@ -192,7 +194,6 @@ void ATriggerShape::OnConstruction(const FTransform& Transform)
 void ATriggerShape::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -202,14 +203,17 @@ void ATriggerShape::Tick(float DeltaTime)
 
 }
 
-void ATriggerShape::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATriggerShape::BeginOverlap(UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
 {
 	TriggerBegin(SweepResult);
 }
 
-void ATriggerShape::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ATriggerShape::EndOverlap(UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex)
 {
 	TriggerEnd();
 }

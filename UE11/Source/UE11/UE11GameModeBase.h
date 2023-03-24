@@ -18,36 +18,33 @@ UCLASS()
 class UE11_API AUE11GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
-public:
-	AUE11GameModeBase();
-
-private:
-	TSubclassOf<UUserWidget>	mMainHUDClass;
-	UMainHUDBase*				mMainHUD;		// UsetWidget으로 만들어진 진짜 객체를 가리키는 포인터
+private:	
+	TSubclassOf<UUserWidget>	m_MainHUDClass;
+	UMainHUDBase*				m_MainHUD;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<TSubclassOf<APlayerCharacter>>	mPlayerClassArray;
 
-	class UUE11SaveGame*	mSaveGame;
+	class UUE11SaveGame* mSaveGame;
 
 public:
-	virtual void BeginPlay() override;
+	class UUE11SaveGame* GetSaveGame()
+	{
+		return mSaveGame;
+	}
+
+public:
+	AUE11GameModeBase();
+
+public:
+	virtual void BeginPlay()	override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
 	virtual void PostLogin(APlayerController* NewPlayer);
 	virtual void Tick(float DeltaTime)	override;
 
 public:
-	UMainHUDBase* GetMainHUD()
-	{
-		return mMainHUD;
-	}
-
-	class UUE11SaveGame* GetSaveGame()
-	{
-		return mSaveGame;
-	}
+	UMainHUDBase* GetMainHUD() { return m_MainHUD;}
 
 private:
 	void SaveGame();

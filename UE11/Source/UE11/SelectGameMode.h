@@ -15,9 +15,6 @@ class UE11_API ASelectGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-public:
-	ASelectGameMode();
-
 private:
 	TSubclassOf<USelectWidget>	mSelectHUDClass;
 	USelectWidget* mSelectHUD;
@@ -29,6 +26,9 @@ public:
 	}
 
 public:
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
+	ASelectGameMode();
+
+public:
+	virtual void BeginPlay()	override;
+	virtual void Tick(float DeltaTime)	override;
 };

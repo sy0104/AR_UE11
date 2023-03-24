@@ -12,7 +12,7 @@ UCLASS()
 class UE11_API AGrux : public AMonster
 {
 	GENERATED_BODY()
-	
+
 public:
 	AGrux();
 

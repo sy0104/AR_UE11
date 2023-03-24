@@ -55,6 +55,8 @@ public:
 		mPlayerInfo.AttackDistance = Dist;
 	}
 
+
+
 public:
 	void InitPlayer();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);

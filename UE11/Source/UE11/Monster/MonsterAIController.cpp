@@ -31,7 +31,8 @@ void AMonsterAIController::SetBehaviorTree(const FString& Path)
 	mAITree = LoadObject<UBehaviorTree>(nullptr, *Path);
 }
 
-void AMonsterAIController::SetBlackboard(const FString& Path)
+void AMonsterAIController::SetBlackboard(
+	const FString& Path)
 {
 	mAIBlackboard = LoadObject<UBlackboardData>(nullptr, *Path);
 }

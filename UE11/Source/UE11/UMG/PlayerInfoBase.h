@@ -4,7 +4,7 @@
 
 #include <Components\ProgressBar.h>
 
-#include "../GameInfo.h"
+#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "PlayerInfoBase.generated.h"
 
@@ -15,15 +15,14 @@ UCLASS()
 class UE11_API UPlayerInfoBase : public UUserWidget
 {
 	GENERATED_BODY()
-	
 private:
-	UProgressBar*		mHPBar;
-	UProgressBar*		mMPBar;
+	UProgressBar*	m_HPBar;
+	UProgressBar*	m_MPBar;
 
 public:
-	void SetHP(float Ratio);
+	void SetHP(float _Ratio);
 
 public:
-	virtual void NativeConstruct() override;										// BeginPlay() 역할
-	virtual void NativeTick(const FGeometry& _geo, float _DeltaTime) override;		// Tick() 역할
+	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& _geo, float _DeltaTime) override;
 };

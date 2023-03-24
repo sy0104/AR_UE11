@@ -3,9 +3,9 @@
 
 #include "PacketStream.h"
 
-CPacketStream::CPacketStream()
-	: mBuffer(nullptr)
-	, mLength(0)
+CPacketStream::CPacketStream()	:
+	mBuffer(nullptr),
+	mLength(0)
 {
 }
 

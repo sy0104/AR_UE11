@@ -14,18 +14,18 @@ UCLASS()
 class UE11_API USelectWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 private:
-	UButton* mStartBtn;
+	UButton* m_StartBtn;
 
 public:
 	void SetStartButtonVisibility(bool Visible)
 	{
 		if (Visible)
-			mStartBtn->SetVisibility(ESlateVisibility::Visible);
+			m_StartBtn->SetVisibility(ESlateVisibility::Visible);
 
 		else
-			mStartBtn->SetVisibility(ESlateVisibility::Collapsed);
+			m_StartBtn->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
 public:

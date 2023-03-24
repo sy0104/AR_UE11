@@ -8,22 +8,23 @@ public class UE11 : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] {
-              "Core"
-            , "CoreUObject"
-            , "Engine"
-            , "InputCore"
-            , "AIModule"
-            , "GameplayTasks"
-            , "NavigationSystem"
-            , "UMG"
-            , "Niagara"
+		PublicDependencyModuleNames.AddRange(new string[] 
+		{ 
+			  "Core"
+			, "CoreUObject"
+			, "Engine"
+			, "InputCore"
+			, "AIModule"
+			, "GameplayTasks"
+			, "NavigationSystem"
+			, "UMG"
+			, "Niagara"
 			, "MovieScene"
-            , "LevelSequence"
-            , "MediaAssets"
-            , "Networking"
-            , "Sockets"
-        });
+			, "LevelSequence"
+			, "MediaAssets"
+			, "Networking"
+			, "Sockets"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

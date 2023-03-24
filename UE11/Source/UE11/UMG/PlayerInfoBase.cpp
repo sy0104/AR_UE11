@@ -8,16 +8,17 @@ void UPlayerInfoBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	mHPBar = Cast<UProgressBar>(GetWidgetFromName(FName(TEXT("HPBar"))));
-	mMPBar = Cast<UProgressBar>(GetWidgetFromName(FName(TEXT("MPBar"))));
+	m_HPBar = Cast<UProgressBar>(GetWidgetFromName(FName(TEXT("HP_Bar"))));
+	m_MPBar = Cast<UProgressBar>(GetWidgetFromName(FName(TEXT("MP_Bar"))));
 }
 
 void UPlayerInfoBase::NativeTick(const FGeometry& _geo, float _DeltaTime)
 {
 	Super::NativeTick(_geo, _DeltaTime);
+
 }
 
-void UPlayerInfoBase::SetHP(float Ratio)
+void UPlayerInfoBase::SetHP(float _Ratio)
 {
-	mHPBar->SetPercent(Ratio);
+	m_HPBar->SetPercent(_Ratio);
 }

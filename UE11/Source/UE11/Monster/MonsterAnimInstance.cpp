@@ -8,6 +8,7 @@ UMonsterAnimInstance::UMonsterAnimInstance()
 {
 	mAnimType = EMonsterAnimType::Idle;
 	mHitAdditive = 0.f;
+	mLoopFalse = false;
 }
 
 void UMonsterAnimInstance::NativeInitializeAnimation()
@@ -63,7 +64,6 @@ void UMonsterAnimInstance::AnimNotify_Skill2()
 
 	if (IsValid(Monster))
 		Monster->Skill2();
-
 }
 
 void UMonsterAnimInstance::AnimNotify_Skill3()
@@ -72,7 +72,6 @@ void UMonsterAnimInstance::AnimNotify_Skill3()
 
 	if (IsValid(Monster))
 		Monster->Skill3();
-
 }
 
 void UMonsterAnimInstance::AnimNotify_SkillEnd()

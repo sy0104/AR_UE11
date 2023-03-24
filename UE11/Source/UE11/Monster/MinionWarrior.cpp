@@ -61,12 +61,15 @@ void AMinionWarrior::UnPossessed()
 void AMinionWarrior::Attack()
 {
 	AAIController* MonsterController = Cast<AAIController>(GetController());
+
 	ACharacter* Target = Cast<ACharacter>(MonsterController->GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
 
 	if (IsValid(Target))
 	{
 		FActorSpawnParameters	SpawnParam;
-		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		//SpawnParam.Template = mHitActor;
+		SpawnParam.SpawnCollisionHandlingOverride =
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		// 타겟과 몬스터 사이에 이펙트를 재생한다.
 		FVector	Dir = GetActorLocation() - Target->GetActorLocation();
@@ -74,11 +77,17 @@ void AMinionWarrior::Attack()
 
 		FVector	ParticleLoc = Target->GetActorLocation() + Dir * 50.f;
 
-		AParticleCascade* Particle = GetWorld()->SpawnActor<AParticleCascade>(ParticleLoc, Dir.Rotation(), SpawnParam);
+		AParticleCascade* Particle =
+			GetWorld()->SpawnActor<AParticleCascade>(
+				ParticleLoc,
+				Dir.Rotation(),
+				SpawnParam);
 
 		Particle->SetParticle(TEXT("ParticleSystem'/Game/ParagonYin/FX/Particles/Yin/Abilities/Primary/FX/P_Yin_Primary_Impact.P_Yin_Primary_Impact'"));
 		Particle->SetSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
 
-		Target->TakeDamage((float)mInfo.AttackPoint, FDamageEvent(), GetController(), this);
+		Target->TakeDamage(
+			(float)mInfo.AttackPoint,
+			FDamageEvent(), GetController(), this);
 	}
 }

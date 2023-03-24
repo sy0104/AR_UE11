@@ -57,7 +57,8 @@ void ASkillActor::Tick(float DeltaTime)
 
 void ASkillActor::SetSkeletalMesh(const FString& Path)
 {
-	USkeletalMesh* SkeletalMesh = LoadObject<USkeletalMesh>(nullptr, *Path);
+	USkeletalMesh* SkeletalMesh = LoadObject<USkeletalMesh>(
+		nullptr, *Path);
 
 	if (IsValid(SkeletalMesh))
 		mSkeletalMesh->SetSkeletalMesh(SkeletalMesh);
@@ -65,7 +66,8 @@ void ASkillActor::SetSkeletalMesh(const FString& Path)
 
 void ASkillActor::SetStaticMesh(const FString& Path)
 {
-	UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(nullptr, *Path);
+	UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(
+		nullptr, *Path);
 
 	if (IsValid(StaticMesh))
 		mStaticMesh->SetStaticMesh(StaticMesh);
@@ -73,7 +75,8 @@ void ASkillActor::SetStaticMesh(const FString& Path)
 
 void ASkillActor::SetParticle(const FString& Path)
 {
-	UParticleSystem* Particle = LoadObject<UParticleSystem>(nullptr, *Path);
+	UParticleSystem* Particle = LoadObject<UParticleSystem>(
+		nullptr, *Path);
 
 	if (IsValid(Particle))
 		mParticle->SetTemplate(Particle);
@@ -92,7 +95,8 @@ void ASkillActor::SetNiagara(UNiagaraSystem* Niagara)
 
 void ASkillActor::SetNiagara(const FString& Path)
 {
-	UNiagaraSystem* Niagara = LoadObject<UNiagaraSystem>(nullptr, *Path);
+	UNiagaraSystem* Niagara = LoadObject<UNiagaraSystem>(
+		nullptr, *Path);
 
 	if (IsValid(Niagara))
 		mNiagara->SetAsset(Niagara);
@@ -120,9 +124,14 @@ void ASkillActor::CreateDecal(const FHitResult& Hit)
 
 	FActorSpawnParameters	SpawnParam;
 	SpawnParam.Template = mDecal;
-	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParam.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ADecal* Decal = GetWorld()->SpawnActor<ADecal>(GetActorLocation(), GetActorRotation(), SpawnParam);
+	ADecal* Decal =
+		GetWorld()->SpawnActor<ADecal>(
+			GetActorLocation(),
+			GetActorRotation(),
+			SpawnParam);
 
 	PrintViewport(10.f, FColor::Red, FString::Printf(TEXT("LifeSpan : %.5f"), mDecalLifeSpan));
 	Decal->SetLifeSpan(mDecalLifeSpan);
@@ -139,8 +148,11 @@ void ASkillActor::CreateDecal(const FHitResult& Hit)
 
 		FHitResult	LineHit;
 		bool Collision = GetWorld()->LineTraceSingleByChannel(
-			LineHit, GetActorLocation(), GetActorLocation() + FVector::DownVector * 1000.f,
-			ECollisionChannel::ECC_Visibility, param);
+			LineHit,
+			GetActorLocation(),
+			GetActorLocation() + FVector::DownVector * 1000.f,
+			ECollisionChannel::ECC_Visibility,
+			param);
 
 		if (Collision)
 		{

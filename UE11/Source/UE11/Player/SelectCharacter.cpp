@@ -22,7 +22,8 @@ ASelectCharacter::ASelectCharacter()
 void ASelectCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+
 	GetMesh()->SetCustomDepthStencilValue(mStencilValue);
 }
 
@@ -56,7 +57,6 @@ void ASelectCharacter::NotifyActorEndCursorOver()
 	mStencilValue -= 10;
 
 	GetMesh()->SetCustomDepthStencilValue(mStencilValue);
-
 }
 
 void ASelectCharacter::NotifyActorOnClicked(FKey ButtonPressed)
@@ -66,7 +66,9 @@ void ASelectCharacter::NotifyActorOnClicked(FKey ButtonPressed)
 	ASelectGameMode* GameMode = GetWorld()->GetAuthGameMode<ASelectGameMode>();
 
 	if (IsValid(GameMode))
+	{
 		GameMode->GetSelectWidget()->SetStartButtonVisibility(true);
+	}
 
 	UUE11GameInstance* GameInst = GetWorld()->GetGameInstance<UUE11GameInstance>();
 
@@ -77,30 +79,25 @@ void ASelectCharacter::NotifyActorOnClicked(FKey ButtonPressed)
 void ASelectCharacter::NotifyActorOnReleased(FKey ButtonReleased)
 {
 	Super::NotifyActorOnReleased(ButtonReleased);
-
 }
 
 void ASelectCharacter::NotifyActorOnInputTouchBegin(const ETouchIndex::Type FingerIndex)
 {
 	Super::NotifyActorOnInputTouchBegin(FingerIndex);
-
 }
 
 void ASelectCharacter::NotifyActorOnInputTouchEnd(const ETouchIndex::Type FingerIndex)
 {
 	Super::NotifyActorOnInputTouchEnd(FingerIndex);
-
 }
 
 void ASelectCharacter::NotifyActorOnInputTouchEnter(const ETouchIndex::Type FingerIndex)
 {
 	Super::NotifyActorOnInputTouchEnter(FingerIndex);
-
 }
 
 void ASelectCharacter::NotifyActorOnInputTouchLeave(const ETouchIndex::Type FingerIndex)
 {
 	Super::NotifyActorOnInputTouchLeave(FingerIndex);
-
 }
 

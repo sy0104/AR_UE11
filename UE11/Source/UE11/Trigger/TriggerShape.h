@@ -17,24 +17,24 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	ETriggerShape		mShape;
+	ETriggerShape	mShape;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	USceneComponent*	mRoot;
+	USceneComponent* mRoot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UBoxComponent*		mBox;
+	UBoxComponent* mBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	USphereComponent*	mSphere;
+	USphereComponent* mSphere;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UCapsuleComponent*	mCapsule;
+	UCapsuleComponent* mCapsule;
 
 public:
 	void ChangeShape(ETriggerShape Shape);
 	void ChangeCollisionProfile(const FString& Name);
-	void EnableCollision(bool Enable);		// 콜리젼의 활성, 비활성 체크
+	void EnableCollision(bool Enable);
 
 public:
 	virtual void OnConstruction(const FTransform& Transform);
@@ -49,14 +49,18 @@ public:
 
 public:
 	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, 
+		const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	void EndOverlap(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
 
 public:
 	virtual void TriggerBegin(const FHitResult& SweepResult);
 	virtual void TriggerEnd();
 };
+

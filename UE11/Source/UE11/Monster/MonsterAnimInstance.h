@@ -6,9 +6,6 @@
 #include "Animation/AnimInstance.h"
 #include "MonsterAnimInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UE11_API UMonsterAnimInstance : public UAnimInstance
 {
@@ -22,10 +19,13 @@ protected:
 	EMonsterAnimType	mAnimType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	float				mHitAdditive;
+	float	mHitAdditive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UAnimMontage*		mHitMontage;
+	UAnimMontage* mHitMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	bool	mLoopFalse;
 
 public:
 	void ChangeAnim(EMonsterAnimType Anim)
@@ -74,6 +74,6 @@ public:
 	UFUNCTION()
 	void AnimNotify_Skill3();
 
-	UFUNCTION()
+	UFUNCTION()		
 	void AnimNotify_SkillEnd();
 };

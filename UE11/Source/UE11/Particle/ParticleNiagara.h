@@ -12,15 +12,16 @@ UCLASS()
 class UE11_API AParticleNiagara : public AParticleBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	AParticleNiagara();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UNiagaraComponent*	mParticle;
+	UNiagaraComponent* mParticle;
 
 protected:
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
@@ -30,5 +31,4 @@ public:
 public:
 	UFUNCTION()
 	void ParticleFinish(UNiagaraComponent* Particle);
-
 };

@@ -20,20 +20,20 @@ class UE11_API UUE11SaveGame : public USaveGame
 	
 private:
 	UPROPERTY()
-	FPlayerInfo		mPlayerInfo;
+	FPlayerInfo	mPlayerInfo;
 
 	UPROPERTY()
-	float			mCameraZoomMin;
+	float	mCameraZoomMin;
 
 	UPROPERTY()
-	float			mCameraZoomMax;
+	float	mCameraZoomMax;
 
 	UPROPERTY()
-	FVector			mLocation;
+	FVector	mLocation;
 
 	UPROPERTY()
-	FVector			mScale;
+	FVector	mScale;
 
 	UPROPERTY()
-	FRotator		mRotation;
+	FRotator	mRotation;
 };

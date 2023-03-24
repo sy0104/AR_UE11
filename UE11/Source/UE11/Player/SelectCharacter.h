@@ -17,12 +17,12 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	EPlayerJob		mJob;
+	EPlayerJob	mJob;
 
 	int32	mStencilValue;
 
 public:
-	EPlayerJob GetJob() const
+	EPlayerJob GetJob()	const
 	{
 		return mJob;
 	}

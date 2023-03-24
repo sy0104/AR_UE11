@@ -14,7 +14,7 @@ public:
 	~CPacketStream();
 
 private:
-	uint8*	mBuffer;
+	uint8* mBuffer;
 	int32	mLength;
 
 public:
@@ -23,7 +23,6 @@ public:
 		mBuffer = Buffer;
 	}
 
-public:
 	int32 GetLength()
 	{
 		return mLength;

@@ -36,14 +36,16 @@ protected:
 	FName				mMonsterTableRowName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UWidgetComponent*	mWidgetComponent;
+	UWidgetComponent*	mWidgetComopnent;
 
-	float	mRatio;
+	float m_Ratio;
 
 	AActor* mHitActor;
+
 	EPatrolType	mPatrolType;
 
 	class UMonsterAnimInstance* mAnimInst;
+
 	class AMonsterSpawnPoint* mSpawnPoint;
 
 	bool		mAttackEnd;
@@ -92,10 +94,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<FMonsterSkillInfo>	mSkillDataArray;
 
-	int32		mUseSkillIndex;
+	int32	mUseSkillIndex;
 
 public:
-	int32 GetUseSkillIndex() const
+	int32 GetUseSkillIndex()	const
 	{
 		return mUseSkillIndex;
 	}
@@ -278,7 +280,6 @@ public:
 public:
 	virtual void OnConstruction(const FTransform& Transform);
 
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -298,6 +299,7 @@ public:
 public:
 	virtual void Attack();
 
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void PauseAI();
@@ -305,13 +307,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ReStartAI();
 
+
+
 private:
 	void UseSkill(float DeltaTime);
 
 public:
 	void ClearSkill();
 	void ClearCurrentSkill();
-	
 	virtual void Skill1();
 	virtual void Skill2();
 	virtual void Skill3();

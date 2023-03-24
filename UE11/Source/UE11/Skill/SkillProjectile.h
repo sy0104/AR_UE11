@@ -20,8 +20,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	UProjectileMovementComponent* mProjectile;
 
-	float		mDistance;
-	FVector		mPrevLocation;
+	float			mDistance;
+	FVector			mPrevLocation;
 
 public:
 	UProjectileMovementComponent* GetProjectile()	const
@@ -29,7 +29,6 @@ public:
 		return mProjectile;
 	}
 
-public:
 	void SetDistance(float Distance)
 	{
 		mDistance = Distance;
@@ -37,8 +36,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
+
 public:
+	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 public:

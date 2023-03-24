@@ -15,11 +15,14 @@ UBTTask_PatrolWait::UBTTask_PatrolWait()
 	mWaitTime = 2.f;
 }
 
-EBTNodeResult::Type UBTTask_PatrolWait::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_PatrolWait::ExecuteTask(
+	UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	EBTNodeResult::Type result = Super::ExecuteTask(OwnerComp, NodeMemory);
+	EBTNodeResult::Type result = Super::ExecuteTask(OwnerComp,
+		NodeMemory);
 
-	AMonsterAIController* Controller = Cast<AMonsterAIController>(OwnerComp.GetAIOwner());
+	AMonsterAIController* Controller =
+		Cast<AMonsterAIController>(OwnerComp.GetAIOwner());
 
 	if (!IsValid(Controller))
 		return EBTNodeResult::Failed;
@@ -46,22 +49,28 @@ EBTNodeResult::Type UBTTask_PatrolWait::ExecuteTask(UBehaviorTreeComponent& Owne
 	return EBTNodeResult::InProgress;
 }
 
-EBTNodeResult::Type UBTTask_PatrolWait::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_PatrolWait::AbortTask(
+	UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	EBTNodeResult::Type result = Super::AbortTask(OwnerComp, NodeMemory);
+	EBTNodeResult::Type result = Super::AbortTask(OwnerComp,
+		NodeMemory);
 
 	return result;
 }
 
-void UBTTask_PatrolWait::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+void UBTTask_PatrolWait::TickTask(
+	UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
+	float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	AMonsterAIController* Controller = Cast<AMonsterAIController>(OwnerComp.GetAIOwner());
+	AMonsterAIController* Controller =
+		Cast<AMonsterAIController>(OwnerComp.GetAIOwner());
 
 	if (!IsValid(Controller))
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);		// Task를 종료시킨다.
+		// Task를 종료시킨다.
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
 
@@ -69,7 +78,8 @@ void UBTTask_PatrolWait::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (!IsValid(Monster))
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);		// Task를 종료시킨다.
+		// Task를 종료시킨다.
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
 
@@ -80,7 +90,8 @@ void UBTTask_PatrolWait::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (IsValid(Target))
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);		// Task를 종료시킨다.
+		// Task를 종료시킨다.
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		return;
 	}
 
@@ -93,7 +104,9 @@ void UBTTask_PatrolWait::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	}
 }
 
-void UBTTask_PatrolWait::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
+void UBTTask_PatrolWait::OnTaskFinished(
+	UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
+	EBTNodeResult::Type TaskResult)
 {
 	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
 }

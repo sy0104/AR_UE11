@@ -3,26 +3,28 @@
 #pragma once
 
 #include <Components\Button.h>
-
 #include "../GameInfo.h"
+
+#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "StartHUDBase.generated.h"
 
-
+/**
+ * 
+ */
 UCLASS()
 class UE11_API UStartHUDBase : public UUserWidget
 {
 	GENERATED_BODY()
-	
 private:
-	UButton*	mStartButton;
-	UButton*	mEndButton;
+	UButton*	m_StartBtn;
+	UButton*	m_EndBtn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	FName		mNextLevelName;
+	FName		m_NextLevelName;
 
-	TMap<FString, UWidgetAnimation*>	mMapWidgetAnim;
-
+	TMap<FString, UWidgetAnimation*> m_mapWidgetAnim;
+	
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* StartBtnHoverAnim;
 
@@ -39,5 +41,4 @@ public:
 
 	UFUNCTION()
 	void OnStartBtnUnhover();
-
 };

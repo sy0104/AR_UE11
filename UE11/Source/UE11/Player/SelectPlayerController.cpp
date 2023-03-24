@@ -3,13 +3,14 @@
 
 #include "SelectPlayerController.h"
 
+
 ASelectPlayerController::ASelectPlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	//bFindCameraComponentWhenViewTarget = true;
 	bShowMouseCursor = true;
 
-	// 마우스 위에 있는 액터를 인지하는 기능 on
+	// 마우스 위에 있는 액터를 인지하는 기능 온
 	bEnableMouseOverEvents = true;
 
 	bEnableClickEvents = true;
@@ -19,26 +20,34 @@ ASelectPlayerController::ASelectPlayerController()
 
 void ASelectPlayerController::BeginPlay()
 {
+	// Super :: 자기자신의 부모클래스를 의미한다.
 	Super::BeginPlay();
 
-	FInputModeGameAndUI Mode;
+	// FInputModeUIOnly
+	// FInputModeGameOnly
+	// FInputModeGameAndUI
+
+	FInputModeGameAndUI	Mode;
 	SetInputMode(Mode);
+
 }
 
 void ASelectPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FHitResult result;
-	bool Hit = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, result);
+	FHitResult	result;
+	bool Hit = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility,
+		false, result);
 
 	if (Hit)
 	{
-
 	}
 }
 
 void ASelectPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+
+	//InputComponent->BindAxis<>();
 }

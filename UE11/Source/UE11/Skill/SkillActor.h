@@ -32,7 +32,7 @@ protected:
 	UParticleSystemComponent* mParticle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	UNiagaraComponent*	mNiagara;
+	UNiagaraComponent* mNiagara;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	USoundBase* mSound;

@@ -8,19 +8,20 @@ ASkillProjectile::ASkillProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	mProjectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
-	mProjectile->SetUpdatedComponent(RootComponent);
-	mProjectile->InitialSpeed = 1000.f;
 
-	mDistance = -1.f;	// -1이면 계속 날아가도록 한다.
+	mProjectile->SetUpdatedComponent(RootComponent);
+
+	mProjectile->InitialSpeed = 1000.f;
+	mDistance = -1.f;
 }
 
 void ASkillProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	mProjectile->OnProjectileStop.AddDynamic(this, &ASkillProjectile::CollisionProjectile);
+	mProjectile->OnProjectileStop.AddDynamic(this, 
+		&ASkillProjectile::CollisionProjectile);
 
-	// 투사체가 날아가기 시작할 때 위치를 저장해둔다.
 	mPrevLocation = GetActorLocation();
 }
 
@@ -28,7 +29,7 @@ void ASkillProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (mDistance > 1.f)
+	if (mDistance > -1.f)
 	{
 		float Dist = FVector::Distance(mPrevLocation, GetActorLocation());
 

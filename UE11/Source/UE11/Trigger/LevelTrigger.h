@@ -5,9 +5,7 @@
 #include "TriggerShape.h"
 #include "LevelTrigger.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class UE11_API ALevelTrigger : public ATriggerShape
 {
@@ -15,7 +13,7 @@ class UE11_API ALevelTrigger : public ATriggerShape
 
 public:
 	ALevelTrigger();
-	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	FName	mLevelName;

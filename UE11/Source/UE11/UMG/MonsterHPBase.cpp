@@ -3,23 +3,25 @@
 
 #include "MonsterHPBase.h"
 
+
 void UMonsterHPBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	mHPBar = Cast<UProgressBar>(GetWidgetFromName(FName(TEXT("HPBar"))));
-	mHPBar->SetPercent(mInitRatio);
+	m_HPBar = Cast<UProgressBar>(GetWidgetFromName(FName(TEXT("HP_Bar"))));	
+	m_HPBar->SetPercent(m_InitRatio);
 }
 
 void UMonsterHPBase::NativeTick(const FGeometry& _geo, float _DeltaTime)
 {
 	Super::NativeTick(_geo, _DeltaTime);
+
 }
 
-void UMonsterHPBase::SetHP(float Ratio)
+void UMonsterHPBase::SetHP(float _Ratio)
 {
-	if (IsValid(mHPBar))
+	if (IsValid(m_HPBar))
 	{
-		mHPBar->SetPercent(Ratio);
+		m_HPBar->SetPercent(_Ratio);
 	}
 }
